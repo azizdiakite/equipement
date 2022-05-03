@@ -1,0 +1,120 @@
+<!DOCTYPE HTML>
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity5">
+
+<head th:replace="fragments/header :: head">
+</head>
+<body class="sb-nav-fixed">
+	<div th:insert="fragments/header :: header"></div>
+	<div id="layoutSidenav_content">
+		<main>
+			<div class="container-fluid px-4">
+				<h3 class="mt-4">Gestion des Fourniseurs</h3>
+				<hr />
+				<div class="row">
+					<div class="card mb-4">
+						<div class="card mb-4">
+							<div class="card-header">
+								<i class="fas fa-chart-area me-1"></i>
+								<span th:text="${mode == 0}?'Ajouter un nouveau fournisseur':'Modifier un fournisseur'"></span>
+							</div>
+							<div class="card-body">
+
+								<div class="all-form-element-inner">
+									<form th:object="${supplier}" th:action="@{/supplier}" method="post">
+										<div class="row">
+											<div class="mb-3 col-xl-3 col-md-4">
+												<label for="inputManagerName" class="form-label">Nom du fournisseur:</label>
+												<input class="form-control" name="SupplierName" id="inputSupplierName" th:field="*{name}" placeholder="">
+											</div>
+											<div class="mb-3 col-xl-3 col-md-4">
+												<label for="inputManagerPhone" class="form-label">Contact du fournisseur:</label>
+												<input class="form-control" name="SupplierPhone" id="inputSupplierPhone" th:field="*{contact}" placeholder="">
+											</div>
+											<div class="mb-3 col-xl-3 col-md-4">
+												<label for="inputSupplierMail" class="form-label">Mail du fournisseur:</label>
+												<input type="email" class="form-control" name="SupplierMail" id="inputSupplierMail" th:field="*{mail}" placeholder="">
+											</div>
+										</div>
+										<input type="hidden" th:field="*{id}">
+										<button type="submit" class="btn btn-primary">Enregistrer</button>
+									</form>
+								</div>
+
+
+							</div>
+						</div>
+					</div>
+
+				</div>
+				<div class="card mb-4">
+					<div class="card-header">
+						<i class="fas fa-table me-1"></i>
+						Liste des fournisseurs
+					</div>
+					<div class="card-body">
+						<table class="table table-bordered" id="tab_four">
+							<thead>
+								<th>N°</th>
+								<th>Nom du fournisseur</th>
+								<th>Contact du fournisseur</th>
+								<th>Mail du fournisseur</th>
+								<th>Modifier</th>
+								<th>Supprimer</th>
+							</thead>
+							<tbody>
+								<tr th:each="item,idx : ${suppliers}">
+									<td th:text="${idx.count}"></td>
+									<td th:text="${item.name}"></td>
+									<td th:text="${item.contact}"></td>
+									<td th:text="${item.mail}"></td>
+									<td>
+										<a th:href="@{'/supplier/'+${item.id}}" title="modifier">
+											<button type="button" class="btn btn-custon-four btn-info">
+												<i class="fas fa-edit"></i>
+											</button>
+										</a>
+									</td>
+									<td>
+										<a th:href="@{'/supplier/delete/'+${item.id}}" title="supprimer">
+											<button type="button" class="btn btn-custon-four btn-danger">
+												<i class="fa fa-trash"></i>
+											</button>
+										</a>
+
+									</td>
+
+								</tr>
+							</tbody>
+						</table>
+					</div>
+				</div>
+			</div>
+		</main>
+		<footer class="py-4 bg-light mt-auto" th:insert="fragments/footer :: footer"> </footer>
+	</div>
+	<script th:src="@{/webjars/jquery/3.6.0/jquery.min.js}"></script>
+	<script th:src="@{/webjars/bootstrap/5.1.3/js/bootstrap.min.js}"></script>
+	<script th:src="@{/webjars/font-awesome/5.15.4/js/all.js}"></script>
+	<script th:src="@{/DataTables/datatables.min.js}"></script>
+	<script th:src="@{/webjars/select2/4.0.13/js/select2.min.js}"></script>
+	<script th:src="@{/js/scripts.js}"></script>
+	<script type="text/javascript">
+		$(document)
+				.ready(
+						function() {
+							var table = $('#tab_four')
+									.DataTable(
+											{
+												dom : 'Bfrtip',
+												buttons : [ 'csv', 'excel',
+														'pdf' ],
+												language : {
+													url : "//cdn.datatables.net/plug-ins/1.11.5/i18n/fr-FR.json",
+												}
+											});
+
+						});
+	</script>
+
+</body>
+</html>

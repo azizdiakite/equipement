@@ -1,0 +1,131 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+	xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:pro="http://www.liquibase.org/xml/ns/pro"
+	xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.4.xsd
+      http://www.liquibase.org/xml/ns/pro http://www.liquibase.org/xml/ns/pro/liquibase-pro-4.5.xsd">
+
+	<changeSet author="pkomena" id="202204040000">
+		<renameTable newTableName="district"
+			oldTableName="dictrict" />
+		<renameColumn tableName="site" columnDataType="int"
+			oldColumnName="dictrict_id" newColumnName="district_id" />
+	</changeSet>
+	<changeSet author="pkomena" id="202204040006">
+		<dropNotNullConstraint columnName="longitude"
+			tableName="site" columnDataType="float" />
+		<dropNotNullConstraint columnName="latitude"
+			tableName="site" columnDataType="float" />
+	</changeSet>
+	<changeSet author="pkomena" id="202204040007">
+		<dropUniqueConstraint tableName="site"
+			constraintName="diis_code_UNIQUE" />
+	</changeSet>
+	<changeSet author="pkomena" id="202204050001">
+		<dropColumn tableName="equipement" columnName="brand" />
+		<dropColumn tableName="equipement" columnName="model" />
+		<dropColumn tableName="equipement"
+			columnName="serial_number" />
+		<dropColumn tableName="equipement" columnName="capacity" />
+	</changeSet>
+	<changeSet author="pkomena" id="202204050002">
+		<dropForeignKeyConstraint
+			baseTableName="equipement" constraintName="fk_equipement_supplier1" />
+		<dropIndex tableName="equipement"
+			indexName="fk_equipement_supplier1_idx" />
+		<dropColumn tableName="equipement" columnName="supplier_id" />
+	</changeSet>
+
+	<changeSet author="pkomena" id="202204050003">
+		<addColumn tableName="lab_has_equipement">
+			<column name="brand" afterColumn="equipement_id"
+				type="varchar(255)">
+				<constraints nullable="true" />
+			</column>
+			<column name="model" afterColumn="brand" type="varchar(255)">
+				<constraints nullable="true" />
+			</column>
+			<column name="serial_number" afterColumn="model"
+				type="varchar(255)">
+				<constraints nullable="true" />
+			</column>
+			<column name="supplier_id" afterColumn="serial_number"
+				type="int">
+				<constraints nullable="true" />
+			</column>
+		</addColumn>
+	</changeSet>
+
+	<changeSet author="pkomena" id="202204050004">
+		<dropColumn tableName="panne"
+			columnName="lab_has_equipement_contractor_id" />
+	</changeSet>
+
+	<changeSet author="pkomena" id="202204050005">
+		<dropNotNullConstraint tableName="maintenance"
+			columnName="end_date" columnDataType="date" />
+		<dropNotNullConstraint tableName="maintenance"
+			columnName="lab_staff_name" columnDataType="varchar(100)" />
+		<dropNotNullConstraint tableName="maintenance"
+			columnName="lab_staff_contact" columnDataType="varchar(45)" />
+		<dropNotNullConstraint tableName="maintenance"
+			columnName="intervention" columnDataType="TEXT" />
+		<dropNotNullConstraint tableName="maintenance"
+			columnName="recommendatioon" columnDataType="TEXT" />
+	</changeSet>
+
+	<changeSet author="pkomena" id="202204050006">
+		<addColumn tableName="lab_has_equipement">
+			<column name="status" afterColumn="active" type="int"
+				defaultValue="1">
+				<constraints nullable="true" />
+			</column>
+		</addColumn>
+	</changeSet>
+	<changeSet author="pkomena" id="202204050007">
+		<dropUniqueConstraint tableName="lab"
+			constraintName="electric_context_UNIQUE" />
+		<dropUniqueConstraint tableName="lab"
+			constraintName="lab_manager_mail_UNIQUE" />
+		<dropUniqueConstraint tableName="lab"
+			constraintName="lab_manager_contact_UNIQUE" />
+	</changeSet>
+	<changeSet author="pkomena" id="202204050008">
+		<dropNotNullConstraint
+			tableName="lab_has_equipement" columnName="contractor_id"
+			columnDataType="int" />
+	</changeSet>
+
+	<changeSet author="pkomena" id="202204060001">
+		<addColumn tableName="panne">
+			<column name="description" afterColumn="type"
+				type="varchar(255)"></column>
+		</addColumn>
+	</changeSet>
+	<changeSet author="pkomena" id="202204130001">
+		<addColumn tableName="lab_has_equipement">
+			<column name="location" afterColumn="tag_number"
+				type="varchar(255)"></column>
+		</addColumn>
+	</changeSet>
+
+	<changeSet author="pkomena" id="202204130002">
+		<addColumn tableName="maintenance">
+			<column name="panne_id" afterColumn="recommendatioon"
+				type="int">
+				<constraints nullable="true" />
+			</column>
+		</addColumn>
+		<addForeignKeyConstraint
+			constraintName="fk_panne_maintenance" referencedTableName="panne"
+			baseColumnNames="panne_id" baseTableName="maintenance"
+			referencedColumnNames="id" />
+	</changeSet>
+	<changeSet author="pkomena" id="202204260001">
+		<dropNotNullConstraint tableName="supplier"
+			columnName="contact" columnDataType="varchar(100)" />
+		<dropNotNullConstraint tableName="supplier"
+			columnName="mail" columnDataType="varchar(100)" />
+	</changeSet>
+</databaseChangeLog>

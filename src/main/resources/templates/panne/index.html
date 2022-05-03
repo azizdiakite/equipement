@@ -1,0 +1,284 @@
+<!DOCTYPE HTML>
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity5">
+
+<head th:replace="fragments/header :: head">
+</head>
+<body>
+	<div th:insert="fragments/header :: header"></div>
+	<div id="layoutSidenav_content">
+		<main>
+			<div class="container-fluid px-4">
+				<h3 class="mt-4">Gestion des pannes</h3>
+				<hr />
+				<div class="row">
+					<div class="card mb-4">
+						<div class="card-header">
+							<i class="fas fa-chart-area me-1"></i>
+							<span th:text="${mode == 0}?'Rapporter une panne':'Modifier une panne rapportée'"></span>
+						</div>
+						<div class="card-body">
+
+							<div class="all-form-element-inner">
+								<form th:object="${panne}" th:action="@{/panne}" method="post">
+									<div class="row">
+										<div class="mb-3 col-xl-3 col-md-4">
+											<label for="inputLab" class="form-label">Laboratoire:</label>
+											<select class="form-select" name="site" id="inputLab" onchange="getLabEquipement(this.value)">
+												<option value=""></option>
+												<option th:each="lab : ${labs}" th:value="${lab.id}" th:text="${lab.name}" th:selected="${lab.id == equipement?.labId}"></option>
+											</select>
+										</div>
+										<div class="mb-3 col-xl-3 col-md-4">
+											<label for="inputEquipement" class="form-label">Equipement:</label>
+											<select class="form-select" name="site" id="inputEquipement" th:field="*{labHasEquipementId}">
+											</select>
+										</div>
+										<div class="mb-3 col-xl-3 col-md-3">
+											<label for="inputPanneDate" class="form-label">Date de la panne:</label>
+											<input th:field="*{date}" type="text" class="form-control" id="inputPanneDate" aria-describedby="inputName" placeholder="">
+										</div>
+										<div class="mb-3 col-xl-3 col-md-3">
+											<label for="inputType" class="form-label">Type de panne (criticité):</label>
+											<select class="form-select" name="panne_type" id="inputType" th:field="*{type}">
+												<option value="">-- Choisir une option --</option>
+												<option th:value="'1'" th:text="'1: Mineure'"></option>
+												<option th:value="'2'" th:text="'2: Critique'"></option>
+												<option th:value="'3'" th:text="'3: Majeure(Arrêt)'"></option>
+											</select>
+										</div>
+									</div>
+									<div class="row">
+										<div class="mb-3 col-xl-3 col-md-4">
+											<label for="inputReportDate" class="form-label">Date de la déclaration de la panne:</label>
+											<input th:field="*{reportDate}" type="text" class="form-control" id="inputReportDate" aria-describedby="inputName" placeholder="">
+										</div>
+										<div class="mb-3 col-xl-3 col-md-4">
+											<label for="inputReporterName" class="form-label">Nom de la personne declarant la panne:</label>
+											<input th:field="*{reporterName}" type="text" class="form-control" id="inputReporterName" aria-describedby="inputName" placeholder="">
+										</div>
+										<div class="mb-3 col-xl-3 col-md-4">
+											<label for="inputDescription" class="form-label">Description de la panne:</label>
+											<textarea th:field="*{description}" class="form-control" id="inputDescription"></textarea>
+										</div>
+									</div>
+									<hr />
+									<div class="row">
+										<div class="mb-3 col-xl-3 col-md-4">
+											<label for="inputContractorInformDate" class="form-label">Date d'information au fournisseur :</label>
+											<input th:field="*{contractorInformDate}" type="text" class="form-control" id="inputContractorInformDate" aria-describedby="inputName" placeholder="">
+											<div class="form-text">Renseigner cette date lorsque le fournisseur est informé de la panne, laisser vide sinon</div>
+										</div>
+									</div>
+									<input type="hidden" th:value="${equipement?.labId}" id="inputLabId">
+									<input type="hidden" th:field="*{id}">
+									<button type="submit" class="btn btn-primary px-5">
+										<i class="fas fa-save"></i>
+										&nbsp; &nbsp; Enregistrer
+									</button>
+								</form>
+							</div>
+
+
+						</div>
+					</div>
+				</div>
+				<div class="card mb-4">
+					<div class="card-header">
+						<div class="row align-items-start">
+							<div class="col">
+								<i class="fas fa-table me-1"></i>
+								Liste des pannes déclarées
+							</div>
+							<div class="col text-end">
+								<a th:href="@{'/panne?all='+${all == 0 ? 1 : 0}}" class="btn btn-info">
+									<i class="fas fa-plus"></i>
+									<span th:text="${all == 0} ? 'Afficher toutes les pannes': 'Afficher les pannes en cours'"> </span>
+								</a>
+							</div>
+						</div>
+					</div>
+					<div class="card-body">
+						<table class="table table-bordered" id="tab_maint">
+							<thead>
+								<th>N°</th>
+								<th>Laboratoire</th>
+								<th>Equipement</th>
+								<th>Numéro de série</th>
+								<th>Type de panne</th>
+								<th>Description de panne</th>
+								<th>Date de panne</th>
+								<th>Date de déclaration de la panne</th>
+								<th>Nom du déclarant</th>
+								<th>Date d'information au fournisseur de maintenance</th>
+								<th>Statut de l'équipement</th>
+								<th>Options</th>
+								<th>Supprimer</th>
+							</thead>
+							<tbody>
+								<tr th:each="item,idx : ${pannes}">
+									<td th:text="${idx.count}"></td>
+									<td th:text="${item.labHasEquipement.lab.site.name}"></td>
+									<td th:text="${item.labHasEquipement.equipement.equipementName}"></td>
+									<td th:text="${item.labHasEquipement.serialNumber}"></td>
+									<td th:switch="*{item.type}">
+										<span th:case="1">MINEURE</span>
+										<span th:case="2">CRITIQUE</span>
+										<span th:case="3">MAJEURE (ARRET)</span>
+										<span th:case="*" th:text="*{item.type}"></span>
+									</td>
+									<td th:text="${item.description}"></td>
+									<td th:text="${#dates.format(item.date,'dd/MM/yyyy')}"></td>
+									<td th:text="${#dates.format(item.reportDate,'dd/MM/yyyy')}"></td>
+									<td th:text="${item.reporterName}"></td>
+									<td th:text="${#dates.format(item.contractorInformDate,'dd/MM/yyyy')}"></td>
+									<td th:switch="*{item.labHasEquipement.status}">
+										<span th:case="0">HORS SERVICE</span>
+										<span th:case="1">FONCTIONNEL</span>
+										<span th:case="2">PANNE</span>
+										<span th:case="3">MAINTENANCE EN COURS</span>
+										<span th:case="4">DEPLACE</span>
+									</td>
+									<td>
+										<a th:href="@{'/panne?pid='+${item.id}+'&eid='+${item?.labHasEquipement?.id}}" title="modifier" class="text-primary p-2">
+											<i class="fas fa-edit fa-lg"></i>
+										</a>
+										<a th:href="@{'/maintenance?eid='+${item?.labHasEquipement?.id}+'&pid='+${item.id}}" title="Passer à la maintenance" class="text-warning">
+											<i class="fas fa-tools fa-lg"></i>
+										</a>
+									</td>
+									<td class="">
+										<div class="d-flex justify-content-end">
+											<a th:href="@{'/panne/delete/'+${item.id}}" title="supprimer" class="text-danger">
+												<i class="fa fa-trash fa-lg"></i>
+											</a>
+											&nbsp;&nbsp;
+										</div>
+									</td>
+
+								</tr>
+							</tbody>
+						</table>
+					</div>
+				</div>
+			</div>
+		</main>
+		<footer class="py-4 bg-light mt-auto" th:insert="fragments/footer :: footer"> </footer>
+	</div>
+	<script th:src="@{/webjars/jquery/3.6.0/jquery.min.js}"></script>
+	<script th:src="@{/webjars/jquery-ui/1.13.0/jquery-ui.min.js}"></script>
+	<script th:src="@{/webjars/bootstrap/5.1.3/js/bootstrap.min.js}"></script>
+	<script th:src="@{/webjars/font-awesome/5.15.4/js/all.js}"></script>
+	<script th:src="@{/DataTables/datatables.min.js}"></script>
+	<script th:src="@{/webjars/select2/4.0.13/js/select2.min.js}"></script>
+	<script th:src="@{/js/scripts.js}"></script>
+	<script type="text/javascript">
+		$(document)
+				.ready(
+						function() {
+							var table = $('#tab_maint')
+									.DataTable(
+											{
+												dom : 'Bfrtip',
+												buttons : [ 'csv', 'excel',
+														'pdf' ],
+												language : {
+													url : "//cdn.datatables.net/plug-ins/1.11.5/i18n/fr-FR.json",
+												}
+											});
+
+							//date
+							var dateFormat = "dd/mm/yy", from = $(
+									"#inputPanneDate").datepicker({
+								changeMonth : true,
+								changeYear : true,
+								dateFormat : "dd/mm/yy",
+							}).on(
+									"change",
+									function() {
+										to.datepicker("option", "minDate",
+												getDate(this));
+										out.datepicker("option", "minDate",
+												getDate(this));
+									}), to = $("#inputReportDate").datepicker({
+								changeMonth : true,
+								changeYear : true,
+								dateFormat : "dd/mm/yy",
+							}).on(
+									"change",
+									function() {
+										from.datepicker("option", "maxDate",
+												getDate(this));
+									}), out = $("#inputContractorInformDate")
+									.datepicker({
+										changeMonth : true,
+										changeYear : true,
+										dateFormat : "dd/mm/yy",
+									}).on(
+											"change",
+											function() {
+												from.datepicker("option",
+														"maxDate",
+														getDate(this));
+											});
+							function getDate(element) {
+								var date;
+								try {
+									date = $.datepicker.parseDate(dateFormat,
+											element.value);
+								} catch (error) {
+									date = null;
+								}
+								return date;
+							}
+
+							//select2
+							$('#inputEquipement').select2({
+								placeholder : 'Choisir un équipement'
+							});
+							$('#inputLab').select2({
+								placeholder : 'Choisir un labo'
+							});
+
+							//get selected lab equipement
+							getLabEquipement = function(e) {
+								//get paramter
+								let searchParams = new URLSearchParams(
+										window.location.search);
+								let equipementId = parseInt(searchParams
+										.get('eid'));
+								let panneId = parseInt(searchParams.get('pid'));
+								let link = panneId ? "/lab_equipement/equipement_short/"
+										: "/lab_equipement/func_equipement_short/";
+								if (e) {
+									$
+											.get(
+													link + e,
+													function(data) {
+														var options = '<option value=""></option>';
+														for (d in data) {
+															selected = equipementId === parseInt(data[d].id) ? "selected"
+																	: ""
+															options += '<option value="'+data[d].id+'" '+selected+'>'
+																	+ data[d].equipementName
+																	+ '('
+																	+ data[d].brand
+																	+ ')'
+																	+ ' - SN: '
+																	+ data[d].serialNumber
+																	+ '</option>';
+														}
+														$('#inputEquipement')
+																.html(options);
+													});
+								}
+							}
+
+							//get labId if param eid exists and get equipement from labs
+							let labId = $('#inputLabId').val();
+							getLabEquipement(labId);
+
+						});
+	</script>
+
+</body>
+</html>

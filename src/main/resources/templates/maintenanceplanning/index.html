@@ -1,0 +1,189 @@
+<!DOCTYPE HTML>
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity5">
+
+<head th:replace="fragments/header :: head">
+</head>
+<body class="sb-nav-fixed">
+	<div th:insert="fragments/header :: header"></div>
+	<div id="layoutSidenav_content">
+		<main>
+			<div class="container-fluid px-4">
+				<h3 class="mt-4">Planning de maintenance</h3>
+				<hr />
+				<div class="row">
+					<div class="card mb-4">
+						<div class="card mb-4">
+							<div class="card-header">
+								<i class="fas fa-chart-area me-1"></i>
+								<span th:text="${mode == 0}?'Ajouter une date de maintenance préventive':'Modifier une date de maintenance préventive'"></span>
+							</div>
+							<div class="card-body">
+
+								<div class="all-form-element-inner">
+									<form th:object="${planning}" th:action="@{/maintenanceplanning}" method="post">
+										<div class="row">
+											<div class="mb-3 col-xl-3 col-md-4">
+												<label for="inputLab" class="form-label">Laboratoire:</label>
+												<select class="form-select" name="site" id="inputLab" onchange="getLabEquipement(this.value)">
+													<option value=""></option>
+													<option th:each="lab : ${labs}" th:value="${lab.id}" th:text="${lab.name}" th:selected="${lab.id == equipement?.labId}"></option>
+												</select>
+											</div>
+											<div class="mb-3 col-xl-3 col-md-4">
+												<label for="inputEquipement" class="form-label">Equipement:</label>
+												<select class="form-select" name="site" id="inputEquipement" th:field="*{labHasEquipementId}">
+												</select>
+											</div>
+											<div class="mb-3 col-xl-3 col-md-4">
+												<label for="inputPlanningDate" class="form-label">Date de maintenance préventive:</label>
+												<input th:field="*{date}" type="text" class="form-control" id="inputPlanningDate" aria-describedby="inputName" placeholder="">
+											</div>
+
+										</div>
+										<input type="hidden" th:field="*{id}">
+										<input type="hidden" th:value="${equipement?.labId}" id="inputLabId">
+										<button type="submit" class="btn btn-primary">Enregistrer</button>
+									</form>
+								</div>
+							</div>
+						</div>
+					</div>
+
+				</div>
+				<div class="card mb-4">
+					<div class="card-header">
+						<i class="fas fa-table me-1"></i>
+						Liste des maintenances prévues
+					</div>
+					<div class="card-body">
+						<table class="table table-bordered" id="tab_planning">
+							<thead>
+								<th>N°</th>
+								<th>Laboratoire</th>
+								<th>Equipement</th>
+								<th>Numéro de série</th>
+								<th>Date de maintenance prévue</th>
+								<th>Modifier</th>
+								<th>Supprimer</th>
+							</thead>
+							<tbody>
+								<tr th:each="item,idx : ${plannings}">
+									<td th:text="${idx.count}"></td>
+									<td th:text="${item.labHasEquipement.lab.site.name}"></td>
+									<td th:text="${item.labHasEquipement.equipement.equipementName}"></td>
+									<td th:text="${item.labHasEquipement.serialNumber}"></td>
+									<td th:text="${#dates.format(item.date,'dd/MM/yyyy')}"></td>
+									<td>
+										<a th:href="@{'/maintenanceplanning?pid='+${item.id}+'&eid='+${item?.labHasEquipement?.id}}" title="modifier">
+											<button type="button" class="btn btn-custon-four btn-info">
+												<i class="fas fa-edit"></i>
+											</button>
+										</a>
+									</td>
+									<td>
+										<a th:href="@{'/maintenanceplanning/delete/'+${item.id}}" title="supprimer">
+											<button type="button" class="btn btn-custon-four btn-danger">
+												<i class="fa fa-trash"></i>
+											</button>
+										</a>
+
+									</td>
+
+								</tr>
+							</tbody>
+						</table>
+					</div>
+				</div>
+			</div>
+		</main>
+		<footer class="py-4 bg-light mt-auto" th:insert="fragments/footer :: footer"> </footer>
+	</div>
+	<script th:src="@{/webjars/jquery/3.6.0/jquery.min.js}"></script>
+	<script th:src="@{/webjars/jquery-ui/1.13.0/jquery-ui.min.js}"></script>
+	<script th:src="@{/webjars/bootstrap/5.1.3/js/bootstrap.min.js}"></script>
+	<script th:src="@{/webjars/font-awesome/5.15.4/js/all.js}"></script>
+	<script th:src="@{/DataTables/datatables.min.js}"></script>
+	<script th:src="@{/webjars/select2/4.0.13/js/select2.min.js}"></script>
+	<script th:src="@{/js/scripts.js}"></script>
+	<script type="text/javascript">
+		$(document)
+				.ready(
+						function() {
+							var table = $('#tab_planning')
+									.DataTable(
+											{
+												dom : 'Bfrtip',
+												buttons : [ 'csv', 'excel',
+														'pdf' ],
+												language : {
+													url : "//cdn.datatables.net/plug-ins/1.11.5/i18n/fr-FR.json",
+												}
+											});
+
+							//date
+							var dateFormat = "dd/mm/yy", from = $(
+									"#inputPlanningDate").datepicker({
+								changeMonth : true,
+								changeYear : true,
+								dateFormat : "dd/mm/yy",
+							});
+							function getDate(element) {
+								var date;
+								try {
+									date = $.datepicker.parseDate(dateFormat,
+											element.value);
+								} catch (error) {
+									date = null;
+								}
+								return date;
+							}
+
+							//select2
+							$('#inputEquipement').select2({
+								placeholder : 'Choisir un équipement'
+							});
+							$('#inputLab').select2({
+								placeholder : 'Choisir un labo'
+							});
+
+							//get selected lab equipement
+							getLabEquipement = function(e) {
+								//get paramter
+								let searchParams = new URLSearchParams(
+										window.location.search);
+								let equipementId = parseInt(searchParams
+										.get('eid'));
+								if (e) {
+									$
+											.get(
+													"/lab_equipement/equipement_short/"
+															+ e,
+													function(data) {
+														var options = '<option value=""></option>';
+														for (d in data) {
+															selected = equipementId === parseInt(data[d].id) ? "selected"
+																	: ""
+															options += '<option value="'+data[d].id+'" '+selected+'>'
+																	+ data[d].equipementName
+																	+ '('
+																	+ data[d].brand
+																	+ ')'
+																	+ ' - SN: '
+																	+ data[d].serialNumber
+																	+ '</option>';
+														}
+														$('#inputEquipement')
+																.html(options);
+													});
+								}
+							}
+
+							//get labId if param eid exists and get equipement from labs
+							let labId = $('#inputLabId').val();
+							getLabEquipement(labId);
+
+						});
+	</script>
+
+</body>
+</html>

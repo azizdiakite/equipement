@@ -1,0 +1,181 @@
+<!DOCTYPE HTML>
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity5">
+
+<head th:replace="fragments/header :: head">
+</head>
+<body class="sb-nav-fixed">
+	<div th:insert="fragments/header :: header"></div>
+		<!--  <div id="layoutSidenav">
+		<!--  <div id="layoutSidenav_nav" th:insert="fragments/side :: side"></div>  -->
+		<!--<div id="layoutSidenav_content">  -->
+			<main>
+				<div class="container-fluid px-4">
+					<h3 class="mt-4">Gestion des Laboratoires</h3>
+					<hr />
+					<div class="card mb-4">
+						<div class="card-header">
+							<i class="fas fa-chart-area me-1"></i>
+							<span th:text="${mode == 0}?'Ajouter un nouveau laboratoire':'Modifier un laboratoire'"></span>
+						</div>
+						<div class="card-body">
+
+							<div class="all-form-element-inner">
+								<form th:object="${lab}" th:action="@{/lab}" method="post">
+									<div class="row">
+										<div class="mb-3 col-xl-3 col-md-4">
+											<label for="inputNomSite" class="form-label">Nom établissement sanitaire:</label>
+											<select class="form-control" name="site" id="inputNomSite" th:field="*{siteId}">
+												<option value=""></option>
+												<option th:each="site : ${sites}" th:value="${site.id}" th:text="${site.name}"></option>
+											</select>
+										</div>
+										<div class="mb-3 col-xl-3 col-md-4">
+											<label for="inputManagerName" class="form-label">Nom du point focal:</label>
+											<input class="form-control" name="managerName" id="inputManagerName" th:field="*{labManagerName}" placeholder="">
+										</div>
+										<div class="mb-3 col-xl-3 col-md-4">
+											<label for="inputManagerPhone" class="form-label">Contact du point focal:</label>
+											<input class="form-control" name="managerPhone" id="inputManagerPhone" th:field="*{labManagerPhone}" placeholder="">
+										</div>
+										<div class="mb-3 col-xl-3 col-md-4">
+											<label for="inputManagerMail" class="form-label">Mail du point focal:</label>
+											<input type="email" class="form-control" name="managerMail" id="inputManagerMail" th:field="*{labManagerMail}" placeholder="">
+										</div>
+									</div>
+									<div class="row">
+										<div class="mb-3 col-xl-3 col-md-4">
+											<label for="inputElectContext" class="form-label">Contexte électrique:</label>
+											<input class="form-control" name="electricContext" id="inputElectContext" th:field="*{electricContext}" placeholder="">
+										</div>
+										<div class="mb-3 col-xl-3 col-md-4">
+											<label for="inputLabType" class="form-label">Type de laboratpoire:</label>
+											<select class="form-select" name="labType" id="inputLabType" th:field="*{labType}">
+												<option value="">-- choisir une option --</option>
+												<option th:value="RELAIS" th:text="RELAIS"></option>
+												<option th:value="PLATEFORME" th:text="PLATEFORME"></option>
+											</select>
+										</div>
+										<div class="mb-3 col-xl-2 col-md-3">
+											<label for="inputStaff" class="form-label">Ressources Humaines</label>
+											<input th:field="*{activeStaffNumber}" type="number" class="form-control" id="inputStaff">
+										</div>
+										<div class="mb-3 col-xl-3 col-md-4">
+											<label for="inputInfType" class="form-label">Type Infrastructure:</label>
+											<select class="form-select" name="infType" id="inputInfType" th:field="*{infrastructureType}">
+												<option value="">-- choisir une option --</option>
+												<option th:value="BATIMENT" th:text="BATIMENT"></option>
+												<option th:value="CONTENEUR" th:text="CONTENEUR"></option>
+											</select>
+										</div>
+										<div class="mb-3 col-xl-3 col-md-4">
+											<label for="inputDIEMName" class="form-label">Nom du point focal DIEM:</label>
+											<input class="form-control" name="diemStaffName" id="inputDIEMName" th:field="*{diemStaffName}" placeholder="">
+										</div>
+										<div class="mb-3 col-xl-3 col-md-4">
+											<label for="inputDIEMContact" class="form-label">Contact du point focal DIEM:</label>
+											<input class="form-control" name="diemStaffContact" id="inputDIEMContact" th:field="*{diemStaffContact}" placeholder="">
+										</div>
+										<div class="mb-3 col-xl-3 col-md-4">
+											<label for="inputDIEMMail" class="form-label">Mail du point focal DIEM:</label>
+											<input type="email" class="form-control" name="diemStaffMail" id="inputDIEMMail" th:field="*{diemStaffMail}" placeholder="">
+										</div>
+									</div>
+									<div class="row">
+										<div class="mb-3 col-xl-3 col-md-4">
+											<label for="inputDistrict" class="form-label">Longitude:</label>
+											<input th:field="*{longitude}" type="number" step="any" class="form-control" id="inputLongitude" aria-describedby="longitude" placeholder="Longitude">
+										</div>
+										<div class="mb-3 col-xl-3 col-md-4">
+											<label for="inputDistrict" class="form-label">Latitude:</label>
+											<input th:field="*{latitude}" type="number" step="any" class="form-control" id="inputLatitude" aria-describedby="latitude" placeholder="Latitude">
+										</div>
+									</div>
+									<input type="hidden" th:field="*{id}">
+									<button type="submit" class="btn btn-primary">Enregistrer</button>
+								</form>
+							</div>
+						</div>
+					</div>
+					<div class="card mb-4">
+						<div class="card-header">
+							<i class="fas fa-table me-1"></i>
+							Liste des laboratoires
+						</div>
+						<div class="card-body">
+							<table class="table table-bordered" id="tab_lab">
+								<thead>
+									<th>N°</th>
+									<th>Nom du site</th>
+									<th>Contexte électrique</th>
+									<th>Type de laboratoire</th>
+									<th>Nombre de staff(actif)</th>
+									<th>Type d'infrastructure</th>
+									<th>Longitude</th>
+									<th>Latitude</th>
+									<th>Modifier</th>
+									<th>Supprimer</th>
+								</thead>
+								<tbody>
+									<tr th:each="item,idx : ${labs}">
+										<td th:text="${idx.count}"></td>
+										<td th:text="${item.site.name}"></td>
+										<td th:text="${item.electricContext}"></td>
+										<td th:text="${item.labType}"></td>
+										<td th:text="${item.activeStaffNumber}"></td>
+										<td th:text="${item.infrastructureType}"></td>
+										<td th:text="${item.longitude}"></td>
+										<td th:text="${item.latitude}"></td>
+										<td>
+											<a th:href="@{'/lab/'+${item.id}}" title="modifier">
+												<button type="button" class="btn btn-custon-four btn-info">
+													<i class="fas fa-edit"></i>
+												</button>
+											</a>
+										</td>
+										<td>
+											<a th:href="@{'/lab/delete/'+${item.id}}" title="supprimer">
+												<button type="button" class="btn btn-custon-four btn-danger">
+													<i class="fa fa-trash"></i>
+												</button>
+											</a>
+										</td>
+									</tr>
+								</tbody>
+							</table>
+						</div>
+					</div>
+				</div>
+			</main>
+			<footer class="py-4 bg-light mt-auto" th:insert="fragments/footer :: footer"> </footer>
+	<!--	</div>
+	 </div> -->
+	<script th:src="@{/webjars/jquery/3.6.0/jquery.min.js}"></script>
+	<script th:src="@{/webjars/bootstrap/5.1.3/js/bootstrap.min.js}"></script>
+	<script th:src="@{/webjars/font-awesome/5.15.4/js/all.js}"></script>
+	<script th:src="@{/DataTables/datatables.min.js}"></script>
+	<script th:src="@{/webjars/select2/4.0.13/js/select2.min.js}"></script>
+	<script th:src="@{/js/scripts.js}"></script>
+	<script type="text/javascript">
+		$(document)
+				.ready(
+						function() {
+							var table = $('#tab_lab')
+									.DataTable(
+											{
+												dom : 'Bfrtip',
+												buttons : [ 'csv', 'excel',
+														'pdf' ],
+												language : {
+													url : "//cdn.datatables.net/plug-ins/1.11.5/i18n/fr-FR.json",
+												}
+											});
+							//select
+							$('#inputNomSite').select2({
+								placeholder : "-- Choisir un site --"
+							});
+
+						});
+	</script>
+
+</body>
+</html>
