@@ -23,6 +23,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 @Controller
 @RequestMapping("/maintenanceplanning")
@@ -36,8 +37,25 @@ public class MaintenancePlanningController {
 	private LabService labService;
 
 	@PostMapping(value = "")
-	public String createMaintenancePlanning(@Valid MaintenancePlanning planning) {
-		entityService.createOrUpdate(planning);
+	public String createMaintenancePlanning(@Valid MaintenancePlanning planning, RedirectAttributes redirAttrs) {
+		MaintenancePlanning mp = entityService.findPlanning(planning);
+		try {
+			
+			if (ObjectUtils.isNotEmpty(planning.getId())) {
+				entityService.update(planning);
+				redirAttrs.addFlashAttribute("success", "Modification effectuée avec succès");
+			}
+			else if(ObjectUtils.isEmpty(mp) && ObjectUtils.isEmpty(planning.getId())) {
+				entityService.create(planning);
+				redirAttrs.addFlashAttribute("success", "Modification effectuée avec succès");
+			}
+			else if(ObjectUtils.isNotEmpty(mp) && ObjectUtils.isEmpty(planning.getId())) {
+				redirAttrs.addFlashAttribute("error", "Maintenance déjà planifiée à cette date pour cet équipement");
+			}
+		} catch (Exception e) {
+			redirAttrs.addFlashAttribute("error", e.getMessage());
+		}
+
 		return "redirect:/maintenanceplanning";
 	}
 

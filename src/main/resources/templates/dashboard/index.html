@@ -15,7 +15,7 @@
 				<div class="row">
 					<div class="col-lg-4">
 						<div class="row mb-3 ">
-							<label for="inputLab" class="col-sm-4 col-form-label">Choisir un laboratoire:</label>
+							<label for="inputLab" class="col-sm-4 col-form-label col-form-label-sm">Choisir un laboratoire:</label>
 							<div class="col-sm-8">
 								<select class="form-select" name="site" id="inputLab" onchange="updateList(this)">
 									<option value=""></option>
@@ -26,107 +26,123 @@
 						</div>
 					</div>
 				</div>
-				<hr />
-				<div class="row">
-					<div class="col-xl-3 col-md-3">
-						<div class="card mb-4">
-							<h5 class="card-header text-center">Nombre d'équipements déployés</h5>
-							<div class="card-body text-center">
-								<span class="card-data text-primary" th:text="${equipementCount.all}"></span>
-							</div>
-						</div>
+				<div class="row justify-content-start">
+					<div class="col col-sm-1">
+						<label class="col-form-label col-form-label-sm">Intervalle de date:</label>
 					</div>
-					<div class="col-xl-3 col-md-3">
-						<div class="card mb-4">
-							<h5 class="card-header text-center">Nombre d'équipements fonctionnels</h5>
-							<div class="card-body text-center">
-								<span class="card-data text-success" th:text="${equipementCount.fonctional}"></span>
-							</div>
-						</div>
+					<div class="col-2 col-sm-2">
+						<input th:value="${startDate}" type="text" class="form-control form-control-sm" id="searchStartDate" placeholder="Date début" autocomplete="off">
 					</div>
-					<div class="col-xl-3 col-md-3">
-						<div class="card mb-4">
-							<h5 class="card-header text-center">Nombre d'équipements en arrêt</h5>
-							<div class="card-body text-center">
-								<span class="card-data text-danger" th:text="${equipementCount.stop}"></span>
-							</div>
-						</div>
+					<div class="col-6 col-sm-2">
+						<input th:value="${endDate}" type="text" class="form-control form-control-sm" id="searchEndDate" placeholder="Date de fin" autocomplete="off">
 					</div>
-					<div class="col-xl-3 col-md-3">
-						<div class="card mb-4">
-							<h5 class="card-header text-center">Nombre de maintenance en cours</h5>
-							<div class="card-body text-center">
-								<span class="card-data text-info" th:text="${equipementCount.current}"></span>
-							</div>
+					<div class="col-6 col-sm-2">
+						<button class="btn btn-primary btn-sm" id="searchEndDate" onclick="filterByDate();return false;">Filtrer par date</button>
+					</div>
+				</div>
+			</div>
+			<hr />
+			<div class="row">
+				<div class="col-xl-3 col-md-3">
+					<div class="card mb-4">
+						<h5 class="card-header text-center">Nombre d'équipements déployés</h5>
+						<div class="card-body text-center">
+							<span class="card-data text-primary" th:text="${equipementCount.all}"></span>
 						</div>
 					</div>
 				</div>
-				<div class="row">
-					<div class="col-xl-6">
-						<div class="card mb-4">
-							<div class="card-header">
-								<i class="fas fa-chart-area me-1"></i>
-								Type d'équipements sur les sites
-							</div>
-							<div class="card-body" id="equipement_cat"></div>
-						</div>
-					</div>
-					<div class="col-xl-6">
-						<div class="card mb-4">
-							<div class="card-header">
-								<i class="fas fa-chart-bar me-1"></i>
-								Equipement par type de laboratoire
-							</div>
-							<div class="card-body" id="equipement_lab_type"></div>
+				<div class="col-xl-3 col-md-3">
+					<div class="card mb-4">
+						<h5 class="card-header text-center">Nombre d'équipements fonctionnels</h5>
+						<div class="card-body text-center">
+							<span class="card-data text-success" th:text="${equipementCount.fonctional}"></span>
 						</div>
 					</div>
 				</div>
-				<div class="row">
-					<div class="col-xl-6">
-						<div class="card mb-4">
-							<div class="card-header">
-								<i class="fas fa-chart-area me-1"></i>
-								Classifications des équipements
-							</div>
-							<div class="card-body" id="equipement_warrant"></div>
-						</div>
-					</div>
-					<div class="col-xl-6">
-						<div class="card mb-4">
-							<div class="card-header">
-								<i class="fas fa-chart-bar me-1"></i>
-								Pannes rapportées par criticité
-							</div>
-							<div class="card-body" id="panne_type"></div>
+				<div class="col-xl-3 col-md-3">
+					<div class="card mb-4">
+						<h5 class="card-header text-center">Nombre d'équipements en arrêt</h5>
+						<div class="card-body text-center">
+							<span class="card-data text-danger" th:text="${equipementCount.stop}"></span>
 						</div>
 					</div>
 				</div>
-				<div class="row">
-					<div class="col-xl-6">
-						<div class="card mb-4">
-							<div class="card-header">
-								<i class="fas fa-chart-area me-1"></i>
-								Maintenance préventive
-							</div>
-							<div class="card-body" id="preventive_maintenance"></div>
-						</div>
-					</div>
-					<div class="col-xl-6">
-						<div class="card mb-4">
-							<div class="card-header">
-								<i class="fas fa-chart-area me-1"></i>
-								Maintenance curative
-							</div>
-							<div class="card-body" id="curative_maintenance"></div>
+				<div class="col-xl-3 col-md-3">
+					<div class="card mb-4">
+						<h5 class="card-header text-center">Nombre de maintenance en cours</h5>
+						<div class="card-body text-center">
+							<span class="card-data text-info" th:text="${equipementCount.current}"></span>
 						</div>
 					</div>
 				</div>
 			</div>
-		</main>
-		<footer class="py-4 bg-light mt-auto" th:insert="fragments/footer :: footer"> </footer>
-		<!--	</div>-->
+			<div class="row">
+				<div class="col-xl-6">
+					<div class="card mb-4">
+						<div class="card-header">
+							<i class="fas fa-chart-area me-1"></i>
+							Type d'équipements sur les sites
+						</div>
+						<div class="card-body" id="equipement_cat"></div>
+					</div>
+				</div>
+				<div class="col-xl-6">
+					<div class="card mb-4">
+						<div class="card-header">
+							<i class="fas fa-chart-bar me-1"></i>
+							Equipement par type de laboratoire
+						</div>
+						<div class="card-body" id="equipement_lab_type"></div>
+					</div>
+				</div>
+			</div>
+			<div class="row">
+				<div class="col-xl-6">
+					<div class="card mb-4">
+						<div class="card-header">
+							<i class="fas fa-chart-area me-1"></i>
+							Classifications des équipements
+						</div>
+						<div class="card-body" id="equipement_warrant"></div>
+					</div>
+				</div>
+				<div class="col-xl-6">
+					<div class="card mb-4">
+						<div class="card-header">
+							<i class="fas fa-chart-bar me-1"></i>
+							Pannes rapportées par criticité
+						</div>
+						<div class="card-body" id="panne_type"></div>
+					</div>
+				</div>
+			</div>
+			<div class="row">
+				<div class="col-xl-6">
+					<div class="card mb-4">
+						<div class="card-header">
+							<i class="fas fa-chart-area me-1"></i>
+							Maintenance préventive
+						</div>
+						<div class="card-body" id="preventive_maintenance"></div>
+					</div>
+				</div>
+				<div class="col-xl-6">
+					<div class="card mb-4">
+						<div class="card-header">
+							<i class="fas fa-chart-area me-1"></i>
+							Maintenance curative
+						</div>
+						<div class="card-body" id="curative_maintenance"></div>
+					</div>
+				</div>
+			</div>
+	</div>
+	</main>
+	<footer class="py-4 bg-light mt-auto" th:insert="fragments/footer :: footer"> </footer>
+	<!--	</div>-->
 	</div>
 	<script th:src="@{/webjars/jquery/3.6.0/jquery.min.js}"></script>
+	<script th:src="@{/webjars/jquery-ui/1.13.0/jquery-ui.min.js}"></script>
 	<script th:src="@{/webjars/bootstrap/5.1.3/js/bootstrap.min.js}"></script>
 	<script th:src="@{/webjars/font-awesome/5.15.4/js/all.js}"></script>
 	<script th:src="@{/webjars/highcharts/9.3.2/highcharts.js}"></script>
@@ -134,369 +150,47 @@
 	<script th:src="@{/webjars/highcharts/9.3.2/modules/export-data.js}"></script>
 	<script th:src="@{/webjars/highcharts/9.3.2/modules/accessibility.js}"></script>
 	<script th:src="@{/DataTables/datatables.min.js}"></script>
-		<script th:src="@{/webjars/select2/4.0.13/js/select2.min.js}"></script>
+	<script th:src="@{/webjars/select2/4.0.13/js/select2.min.js}"></script>
 	<script th:src="@{/js/scripts.js}"></script>
+	<script th:src="@{/js/dashboard_home.js}"></script>
 	<script type="text/javascript">
 		$(document)
 				.ready(
 						function() {
+							//date
+							var dateFormat = "dd/mm/yy", from = $(
+									"#searchStartDate").datepicker({
+								changeMonth : true,
+								changeYear : true,
+								dateFormat : "dd/mm/yy",
+							});
+							var dateFormat = "dd/mm/yy", from = $(
+									"#searchEndDate").datepicker({
+								changeMonth : true,
+								changeYear : true,
+								dateFormat : "dd/mm/yy",
+							});
+							function getDate(element) {
+								var date;
+								try {
+									date = $.datepicker.parseDate(dateFormat,
+											element.value);
+								} catch (error) {
+									date = null;
+								}
+								return date;
+							}
+
 							let searchParams = new URLSearchParams(
 									window.location.search);
-							let labId = searchParams
-									.get('l_id')?searchParams
-											.get('l_id'):0;
-							$
-									.get(
-											"/dashboard/equipement_by_name?l_id="+labId+"&e_id=0",
-											function(data) {
-												Highcharts
-														.chart(
-																'equipement_cat',
-																{
-																	chart : {
-																		type : 'column'
-																	},
-																	title : {
-																		text : "Nombres d'équipements par catégorie"
-																	},
-																	xAxis : {
-																		type : 'category'
-																	},
-																	yAxis : {
-																		title : {
-																			text : "Nombre d'équipements"
-																		}
-
-																	},
-																	legend : {
-																		enabled : false
-																	},
-																	plotOptions : {
-																		series : {
-																			borderWidth : 0,
-																			dataLabels : {
-																				enabled : true,
-																			}
-																		}
-																	},
-
-																	tooltip : {
-																		headerFormat : '<span style="font-size:11px">{series.name}</span><br>',
-																		pointFormat : '<span style="color:{point.color}">{point.name}</span>: <b>{point.y}</b><br/>'
-																	},
-
-																	series : [ {
-																		name : "Equipements",
-																		colorByPoint : true,
-																		data : data
-																	} ]
-																});
-											});
-
-							//equipement par type de labo
-							$
-									.get(
-											"/dashboard/equipement_by_lab_type?l_id="+labId+"&e_id=0",
-											function(data) {
-												Highcharts
-														.chart(
-																'equipement_lab_type',
-																{
-																	chart : {
-																		type : 'pie'
-																	},
-																	title : {
-																		text : "Nombres d'équipements par type de laboratoire"
-																	},
-																	legend : {
-																		enabled : true
-																	},
-																	plotOptions : {
-																		pie : {
-																			allowPointSelect : true,
-																			cursor : 'pointer',
-																			dataLabels : {
-																				enabled : true,
-																				format : '<b>{point.name}</b>: {point.y} ({point.percentage:.1f}) %'
-																			}
-																		}
-																	},
-																	tooltip : {
-																		pointFormat : '{series.name}: <b>{point.y} ({point.percentage:.1f}%)</b>'
-																	},
-
-																	series : [ {
-																		name : "Equipements",
-																		colorByPoint : true,
-																		data : data
-																	} ]
-																});
-											});
-
-							//garanti et sous contrat
-							$
-									.get(
-											"/dashboard/equipement_warrant?l_id="+labId+"&e_id=0",
-											function(data) {
-												Highcharts
-														.chart(
-																'equipement_warrant',
-																{
-																	chart : {
-																		type : 'column'
-																	},
-																	title : {
-																		text : "Equipements sous garanti et sous contrat"
-																	},
-																	xAxis : {
-																		type : 'category'
-																	},
-																	yAxis : {
-																		title : {
-																			text : "Nombre d'équipements"
-																		}
-
-																	},
-																	legend : {
-																		enabled : false
-																	},
-																	plotOptions : {
-																		series : {
-																			borderWidth : 0,
-																			dataLabels : {
-																				enabled : true,
-																			}
-																		}
-																	},
-
-																	tooltip : {
-																		headerFormat : '<span style="font-size:11px">{series.name}</span><br>',
-																		pointFormat : '<span style="color:{point.color}">{point.name}</span>: <b>{point.y}</b><br/>'
-																	},
-
-																	series : [ {
-																		name : "Equipements",
-																		colorByPoint : true,
-																		data : data
-																	} ]
-																});
-											});
-
-							//type de maintenance
-							/*		$
-											.get(
-													"/dashboard/equipement_by_maintenance_type?l_id=0&e_id=0",
-													function(data) {
-														Highcharts
-																.chart(
-																		'maintenance_type',
-																		{
-																			chart : {
-																				type : 'pie'
-																			},
-																			title : {
-																				text : "Maintenance réalisées par type"
-																			},
-																			legend : {
-																				enabled : true
-																			},
-																			plotOptions : {
-																				pie : {
-																					allowPointSelect : true,
-																					cursor : 'pointer',
-																					dataLabels : {
-																						enabled : true,
-																						format : '<b>{point.name}</b>: {point.percentage:.1f} %'
-																					}
-																				}
-																			},
-																			tooltip : {
-																				pointFormat : '{series.name}: <b>{point.percentage:.1f}%</b>'
-																			},
-
-																			series : [ {
-																				name : "Equipements",
-																				colorByPoint : true,
-																				data : data
-																			} ]
-																		});
-													}); */
-
-							//type de panne rapportée
-							$
-									.get(
-											"/dashboard/panne_type?l_id="+labId+"&e_id=0",
-											function(data) {
-												Highcharts
-														.chart(
-																'panne_type',
-																{
-																	chart : {
-																		type : 'bar'
-																	},
-																	title : {
-																		text : "Classification des pannes rapportées"
-																	},
-																	xAxis : {
-																		type : 'category'
-																	},
-																	yAxis : {
-																		title : {
-																			text : "Nombre d'équipements",
-																		},
-																		allowDecimals : false
-
-																	},
-																	legend : {
-																		enabled : false
-																	},
-																	plotOptions : {
-																		series : {
-																			borderWidth : 0,
-																			dataLabels : {
-																				enabled : true,
-																			}
-																		}
-																	},
-																	tooltip : {
-																		headerFormat : '<span style="font-size:11px">{series.name}</span><br>',
-																		pointFormat : '<span style="color:{point.color}">{point.name}</span>: <b>{point.y}</b><br/>'
-																	},
-
-																	series : [ {
-																		name : "Equipements",
-																		colorByPoint : true,
-																		data : data
-																	} ]
-																});
-											});
-
-							//Maintenances préventives (planifiées et réalisées)
-							$
-									.get(
-											"/dashboard/preventive_maintenance?l_id="+labId,
-											function(data) {
-												Highcharts
-														.chart(
-																'preventive_maintenance',
-																{
-																	chart : {
-																		type : 'column'
-																	},
-																	title : {
-																		text : "Nombre de maintenance préventive planifiée et réalisée"
-																	},
-																	xAxis : {
-																		categories : data.categories,
-																		crosshair : true
-																	},
-																	yAxis : {
-																		title : {
-																			text : "Nombre de maintenance"
-																		}
-																	},
-																	legend : {
-																		enabled : true
-																	},
-																	plotOptions : {
-																		series : {
-																			allowPointSelect : true,
-																			dataLabels : {
-																				enabled : true,
-																			}
-																		}
-																	},
-																	tooltip : {
-																		headerFormat : '<span style="font-size:10px">{point.key}</span><table>',
-																		pointFormat : '<tr><td style="color:{series.color};padding:0">{series.name}: </td>'
-																				+ '<td style="padding:0"><b>{point.y:.0f} </b></td></tr>',
-																		footerFormat : '</table>',
-																		shared : true,
-																		useHTML : true
-																	},
-
-																	series : [
-																			{
-																				name : "Maintenances préventives planifiées",
-																				data : data.prev,
-																				color : "#AADD44"
-																			},
-																			{
-																				name : "Maintenances préventives réalisées",
-																				data : data.done,
-																				color : "#66BB99"
-																			} ]
-																});
-											});
-
-							//Maintenances curatives
-							$
-									.get(
-											"/dashboard/curative_maintenance?l_id="+labId,
-											function(data) {
-												Highcharts
-														.chart(
-																'curative_maintenance',
-																{
-																	chart : {
-																		type : 'column'
-																	},
-																	title : {
-																		text : "Nombre de maintenance curative"
-																	},
-																	xAxis : {
-																		categories : data.categories,
-																		crosshair : true
-																	},
-																	yAxis : {
-																		title : {
-																			text : "Nombre de maintenance"
-																		}
-																	},
-																	legend : {
-																		enabled : true
-																	},
-																	plotOptions : {
-																		series : {
-																			allowPointSelect : true,
-																			dataLabels : {
-																				enabled : true,
-																			}
-																		}
-																	},
-																	tooltip : {
-																		headerFormat : '<span style="font-size:10px">{point.key}</span><table>',
-																		pointFormat : '<tr><td style="color:{series.color};padding:0">{series.name}: </td>'
-																				+ '<td style="padding:0"><b>{point.y:.0f} </b></td></tr>',
-																		footerFormat : '</table>',
-																		shared : true,
-																		useHTML : true
-																	},
-
-																	series : [ {
-																		name : "Maintenances curatives réalisées",
-																		data : data.done,
-																		color : "#22AA99"
-																	} ]
-																});
-											});
+							let labId = searchParams.get('l_id') ? searchParams
+									.get('l_id') : 0;
+							
 							$('#inputLab').select2({
-								placeholder: 'laboratoire'
+								placeholder : 'laboratoire'
 							});
 
 						});
-		//update list after lab selection
-		updateList = function(e) {
-			let labId = (e.value != -1) ? e.value : null;
-			const parser = new URL(window.location);
-			if (labId) {
-				parser.searchParams.set('l_id', labId);
-				window.location = parser.href;
-			} else {
-				parser.searchParams.delete('l_id');
-				window.location = parser.href;
-			}
-		}
 	</script>
 
 </body>

@@ -17,6 +17,8 @@ public interface MaintenancePlanningService {
 	MaintenancePlanning update(MaintenancePlanning d);
 
 	MaintenancePlanning getOne(int id);
+	
+	MaintenancePlanning findPlanning(MaintenancePlanning d);
 
 	MaintenancePlanning createOrUpdate(MaintenancePlanning d);
 

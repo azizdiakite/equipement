@@ -58,6 +58,9 @@ public class Panne implements Serializable {
 
 	@Column(name = "status", length = 45)
 	private String status;
+	
+	@Column(name = "comment",  nullable = true, length = 255)
+	private String comment;
 
 	@Column(name = "lab_has_equipement_id", nullable = false)
 	private Integer labHasEquipementId;

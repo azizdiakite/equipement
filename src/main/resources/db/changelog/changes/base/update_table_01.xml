@@ -128,4 +128,18 @@
 		<dropNotNullConstraint tableName="supplier"
 			columnName="mail" columnDataType="varchar(100)" />
 	</changeSet>
+	<changeSet author="pkomena" id="202205180001">
+		<dropNotNullConstraint tableName="contractor"
+			columnName="rep_contact" columnDataType="varchar(45)" />
+		<dropNotNullConstraint tableName="contractor"
+			columnName="rep_mail" columnDataType="varchar(100)" />
+	</changeSet>
+	<changeSet author="pkomena" id="202205180002">
+		<addColumn tableName="panne">
+			<column name="comment" afterColumn="status"
+				type="varchar(255)">
+				<constraints nullable="true" />
+			</column>
+		</addColumn>
+	</changeSet>
 </databaseChangeLog>

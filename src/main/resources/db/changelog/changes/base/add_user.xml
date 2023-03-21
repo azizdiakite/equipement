@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+	xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:pro="http://www.liquibase.org/xml/ns/pro"
+	xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.4.xsd
+      http://www.liquibase.org/xml/ns/pro http://www.liquibase.org/xml/ns/pro/liquibase-pro-4.5.xsd">
+
+	<changeSet author="pkomena" id="202205260001">
+		<createTable tableName="app_user">
+			<column name="id" autoIncrement="true" type="int">
+				<constraints primaryKey="true"
+					primaryKeyName="pk_app_user" />
+			</column>
+			<column name="email" type="varchar(255)">
+				<constraints nullable="false" unique="true"
+					uniqueConstraintName="un_user_email" />
+			</column>
+			<column name="password" type="varchar(255)">
+				<constraints nullable="false" />
+			</column>
+			<column name="active" type="boolean" defaultValue="true">
+				<constraints nullable="false" />
+			</column>
+			<column name="locked" type="boolean" defaultValue="false">
+				<constraints nullable="false" />
+			</column>
+			<column name="first_name" type="varchar(100)">
+			</column>
+			<column name="last_name" type="varchar(100)"></column>
+			<column name="phone_contact" type="varchar(45)">
+				<constraints nullable="false" />
+			</column>
+			<column name="role" type="varchar(45)"></column>
+			<column name="last_login" type="datetime"></column>
+			<column name="password_expire_at" type="date"></column>
+			<column name="created_at" type="datetime"></column>
+			<column name="created_by" type="int"></column>
+			<column name="last_updated_at" type="datetime"></column>
+			<column name="last_updated_by" type="int"></column>
+
+		</createTable>
+	</changeSet>
+</databaseChangeLog>

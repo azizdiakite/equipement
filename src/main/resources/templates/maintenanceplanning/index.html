@@ -8,6 +8,8 @@
 	<div id="layoutSidenav_content">
 		<main>
 			<div class="container-fluid px-4">
+				<div class="alert alert-primary alert-dismissible text-center" role="alert" th:text="${success}" th:if="${success}"></div>
+				<div class="alert alert-danger alert-dismissible text-center" role="alert" th:text="${error}" th:if="${error}"></div>
 				<h3 class="mt-4">Planning de maintenance</h3>
 				<hr />
 				<div class="row">
@@ -81,7 +83,7 @@
 										</a>
 									</td>
 									<td>
-										<a th:href="@{'/maintenanceplanning/delete/'+${item.id}}" title="supprimer">
+										<a th:href="@{'/maintenanceplanning/delete/'+${item.id}}" title="supprimer" onclick="return confirm('Voulez-vous supprimer cet enregistrement ?')">
 											<button type="button" class="btn btn-custon-four btn-danger">
 												<i class="fa fa-trash"></i>
 											</button>

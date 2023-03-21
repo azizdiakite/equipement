@@ -1,0 +1,181 @@
+<!DOCTYPE HTML>
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity5">
+
+<head th:replace="fragments/header :: head">
+</head>
+<body class="sb-nav-fixed">
+	<div th:insert="fragments/header :: header"></div>
+	<div id="layoutSidenav_content">
+		<main>
+			<div class="container-fluid px-4">
+				<h3 class="mt-4">Equipements déployés</h3>
+				<hr />
+				<div class="row">
+					<div class="card mb-4">
+						<div class="card mb-4">
+							<div class="card-header">
+								<i class="fas fa-chart-area me-1"></i>
+								<span th:text="${mode == 0}?'Ajouter un nouvel équipement':'Modifier un équipement'"></span>
+							</div>
+							<div class="card-body">
+
+								<div class="all-form-element-inner">
+									<form th:object="${equipement}" th:action="@{/lab_equipement}" method="post">
+										<div class="row">
+											<div class="mb-3 col-xl-3 col-md-4">
+												<label for="inputLab" class="form-label">Laboratoire:</label>
+												<select class="form-control" name="labo" id="inputLab" th:field="*{labId}">
+													<option value=""></option>
+													<option th:each="lab : ${labs}" th:value="${lab.id}" th:text="${lab.name}"></option>
+												</select>
+											</div>
+											<div class="mb-3 col-xl-3 col-md-4">
+												<label for="inputEquip" class="form-label">Equipement:</label>
+												<!--  -->
+												<select class="form-select" name="equipement" id="inputEquip" th:field="*{equipementId}">
+													<option value=""></option>
+													<option th:each="equip : ${equipements}" th:value="${equip.id}" th:text="${equip.equipementName}"></option>
+												</select>
+											</div>
+											<div class="mb-3 col-xl-3 col-md-4">
+												<label for="inputSupplier" class="form-label">Fournisseur livreur:</label>
+												<select class="form-select" name="labo" id="inputSupplier" th:field="*{supplierId}">
+													<option value="">-- Choisir une option --</option>
+													<option th:each="e : ${suppliers}" th:value="${e.id}" th:text="${e.name}"></option>
+												</select>
+												<div id="inputSupplierHelp" class="form-text">Lors de l'achat de l'équipement</div>
+											</div>
+											<div class="mb-3 col-xl-3 col-md-4">
+												<label for="inputContractor" class="form-label">Fournisseur Maintenancier:</label>
+												<select class="form-select" name="contractor" id="inputContractor" th:field="*{contractorId}">
+													<option value="">-- Choisir une option</option>
+													<option th:each="e : ${contractors}" th:value="${e.id}" th:text="${e.name}"></option>
+												</select>
+												<div id="inputContractorHelp" class="form-text">Entité sous contrat en charge de la maintenance</div>
+											</div>
+										</div>
+										<div class="row">
+											<div class="mb-3 col-xl-3 col-md-4">
+												<label for="inputBrand" class="form-label">Marque de l'équipement:</label>
+												<input th:field="*{brand}" type="text" class="form-control" id="inputBrand" aria-describedby="inputName" placeholder="marque equipement">
+											</div>
+											<div class="mb-3 col-xl-3 col-md-4">
+												<label for="inputModel" class="form-label">Modèle de l'équipement:</label>
+												<input th:field="*{model}" type="text" class="form-control" id="inputModel" aria-describedby="inputModel" placeholder="modèle equipement">
+											</div>
+											<div class="mb-3 col-xl-3 col-md-4">
+												<label for="inputTagNum" class="form-label">Numéro Tag:</label>
+												<input th:field="*{tagNumber}" type="text" class="form-control" id="inputModel" aria-describedby="inputModel" placeholder="">
+											</div>
+											<div class="mb-3 col-xl-3 col-md-4">
+												<label for="inputSerialNum" class="form-label">Numéro de série:</label>
+												<input th:field="*{serialNumber}" type="text" class="form-control" id="inputSerialNum" aria-describedby="inputModel" placeholder="">
+											</div>
+										</div>
+										<div class="row">
+											<div class="mb-3 col-xl-3 col-md-4">
+												<label for="inputInstallDate" class="form-label">Date d'installation:</label>
+												<input th:field="*{installationDate}" type="text" class="form-control" id="inputInstallDate" aria-describedby="inputName" placeholder="">
+											</div>
+											<div class="mb-3 col-xl-3 col-md-4">
+												<label for="inputLocation" class="form-label">Emplacement de l'équipement</label>
+												<input th:field="*{location}" type="text" class="form-control" id="inputLocation"  placeholder="">
+											</div>
+											<div class="mb-3 col-xl-3 col-md-4">
+												<label for="inputWarrantyStart" class="form-label">Date début garantie:</label>
+												<input th:field="*{warrantyStartDate}" type="text" class="form-control" id="inputWarrantyStart" aria-describedby="inputName" placeholder="">
+											</div>
+											<div class="mb-3 col-xl-3 col-md-4">
+												<label for="inputWarrantyEnd" class="form-label">Date fin garantie:</label>
+												<input th:field="*{warrantyEndDate}" type="text" class="form-control" id="inputWarrantyEnd" aria-describedby="inputName" placeholder="">
+											</div>
+											<div class="mb-3 col-xl-3 col-md-4">
+												<label for="inputType" class="form-label">Statut de l'équipement:</label>
+												<select class="form-select" name="type" id="inputType" th:field="*{status}">
+													<option th:value="1" th:text="FONCTIONNEL"></option>
+													<option th:value="0" th:text="'HORS SERVICE'"></option>
+													<option th:value="2" th:text="PANNE"></option>
+													<option th:value="3" th:text="'EN COURS DE MAINTENANCE'"></option>
+													<!-- <option th:value="4" th:text="DEPLACE"></option>  -->
+												</select>
+											</div>
+										</div>
+										<input type="hidden" th:field="*{id}">
+										<button type="submit" class="btn btn-primary">Enregistrer</button>
+									</form>
+									<hr />
+									<a th:href="@{/lab_equipement}" class="btn btn-success">
+										<i class="fas fa-angle-double-left"></i>
+										Retour à la liste
+									</a>
+								</div>
+							</div>
+						</div>
+					</div>
+
+				</div>
+			</div>
+		</main>
+		<footer class="py-4 bg-light mt-auto" th:insert="fragments/footer :: footer"> </footer>
+	</div>
+	<script th:src="@{/webjars/jquery/3.6.0/jquery.min.js}"></script>
+	<script th:src="@{/webjars/jquery-ui/1.13.0/jquery-ui.min.js}"></script>
+	<script th:src="@{/webjars/bootstrap/5.1.3/js/bootstrap.min.js}"></script>
+	<script th:src="@{/webjars/font-awesome/5.15.4/js/all.js}"></script>
+	<script th:src="@{/DataTables/datatables.min.js}"></script>
+	<script th:src="@{/webjars/select2/4.0.13/js/select2.min.js}"></script>
+	<script th:src="@{/js/scripts.js}"></script>
+	<script type="text/javascript">
+		$(document)
+				.ready(
+						function() {
+							$('#inputLab').select2({
+								placeholder : "Choisir une option"
+							});
+							$('#inputEquip').select2({
+								placeholder : "Choisir une option"
+							});
+							//date
+							$("#inputInstallDate").datepicker({
+								changeMonth : true,
+								changeYear : true,
+								dateFormat : "dd/mm/yy",
+							});
+							var dateFormat = "dd/mm/yy", from = $(
+									"#inputWarrantyStart").datepicker({
+								changeMonth : true,
+								changeYear : true,
+								dateFormat : "dd/mm/yy",
+							}).on(
+									"change",
+									function() {
+										to.datepicker("option", "minDate",
+												getDate(this));
+									}), to = $("#inputWarrantyEnd").datepicker(
+									{
+										changeMonth : true,
+										changeYear : true,
+										dateFormat : "dd/mm/yy",
+									}).on(
+									"change",
+									function() {
+										from.datepicker("option", "maxDate",
+												getDate(this));
+									});
+
+							function getDate(element) {
+								var date;
+								try {
+									date = $.datepicker.parseDate(dateFormat,
+											element.value);
+								} catch (error) {
+									date = null;
+								}
+								return date;
+							}
+
+						});
+	</script>
+
+</body>
+</html>

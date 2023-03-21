@@ -17,7 +17,7 @@
 						<div class="card mb-4">
 							<div class="card-header">
 								<i class="fas fa-chart-area me-1"></i>
-								<span th:text="${mode == 0}?'Ajouter un nouvel équipement':'Modifier un équipement'"></span>
+								<span th:text="${mode == 0}?'Ajouter un nouveau contrat':'Modifier un contrat'"></span>
 							</div>
 							<div class="card-body">
 
@@ -51,8 +51,11 @@
 												<input th:field="*{contractEndDate}" type="text" class="form-control" id="inputEndDate" aria-describedby="inputName" placeholder="">
 											</div>
 										</div>
-										<input type="hidden" th:field="*{id}">
-										<button type="submit" class="btn btn-primary">Enregistrer</button>
+										<div class="d-flex">
+											<input type="hidden" th:field="*{id}">
+											<button type="submit" class="btn btn-primary mx-2">Enregistrer</button>
+											<a th:href="@{/contractor}" class="btn btn-warning mx-4">Annuler</a>
+										</div>
 									</form>
 								</div>
 

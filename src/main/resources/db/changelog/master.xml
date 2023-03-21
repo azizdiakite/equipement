@@ -12,5 +12,7 @@
 		relativeToChangelogFile="true" />
 	<include file="changes/base/data.xml"
 		relativeToChangelogFile="true" />
+			<include file="changes/base/add_user.xml"
+		relativeToChangelogFile="true" />
 
 </databaseChangeLog>

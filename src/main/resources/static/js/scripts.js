@@ -35,3 +35,37 @@ $(document).ready(function() {
 		}
 	);
 });
+
+//update list after lab selection
+updateList = function(e) {
+	let labId = (e.value != -1) ? e.value : null;
+	const parser = new URL(window.location);
+	if (labId) {
+		parser.searchParams.set('l_id', labId);
+		window.location = parser.href;
+	} else {
+		parser.searchParams.delete('l_id');
+		window.location = parser.href;
+	}
+}
+
+filterByDate = function() {
+	let date1 = $('#searchStartDate').val();
+	let date2 = $('#searchEndDate').val();
+	const parser = new URL(window.location);
+	if (date1) {
+		parser.searchParams.set('start', date1);
+	}
+	else {
+		parser.searchParams.delete('start');
+	}
+	if (date2) {
+		parser.searchParams.set('end', date2);
+	}
+	else {
+		parser.searchParams.delete('end');
+	}
+	window.location = parser.href
+
+
+}

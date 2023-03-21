@@ -114,4 +114,14 @@ public class MaintenancePlanningServiceImpl implements MaintenancePlanningServic
 		}
 	}
 
+	@Override
+	public MaintenancePlanning findPlanning(MaintenancePlanning d) {
+		List<MaintenancePlanning> list = repository.findByLabHasEquipementIdAndDate(d.getLabHasEquipementId(),
+				d.getDate());
+		if (list.size() > 0) {
+			return list.get(0);
+		}
+		return null;
+	}
+
 }

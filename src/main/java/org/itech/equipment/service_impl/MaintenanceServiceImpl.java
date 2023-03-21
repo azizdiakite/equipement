@@ -126,5 +126,10 @@ public class MaintenanceServiceImpl implements MaintenanceService {
 			return false;
 		}
 	}
+	
+	@Override
+	public Maintenance findByPanne(Integer panneId) {
+		return repository.findByPanneId(panneId);
+	}
 
 }

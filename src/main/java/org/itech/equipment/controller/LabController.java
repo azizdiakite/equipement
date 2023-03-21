@@ -3,23 +3,21 @@
  */
 package org.itech.equipment.controller;
 
-import org.itech.equipment.model.District;
+import java.util.List;
+import java.util.Map;
+
+import javax.validation.Valid;
+
 import org.itech.equipment.model.Lab;
-import org.itech.equipment.model.Site;
-import org.itech.equipment.service.DistrictService;
 import org.itech.equipment.service.LabService;
 import org.itech.equipment.service.SiteService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
-
-import javax.validation.Valid;
-import java.util.List;
-import java.util.Map;
 
 /**
  * <h2>LabController</h2>

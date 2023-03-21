@@ -3,12 +3,15 @@
  */
 package org.itech.equipment.controller;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
+import org.apache.commons.lang3.ObjectUtils;
+import org.itech.equipment.exception.OperationFailedException;
 import org.itech.equipment.model.Equipement;
 import org.itech.equipment.service.DashboardService;
 import org.itech.equipment.service.EquipementService;
@@ -34,22 +37,28 @@ public class DashboardController {
 	private EquipementService equipementService;
 
 	@GetMapping(value = "")
-	public String index(@RequestParam(required = false) Integer l_id, @RequestParam(required = false) Integer e_id,
-			Model model) {
+	public String index(@RequestParam(required = false) Integer l_id, Model model,
+			@RequestParam(required = false) String start, @RequestParam(required = false) String end) {
 
 		List<Map<String, Object>> labs = labService.getLabsIdAndNames();
 		List<Equipement> equipements = equipementService.getAll();
-		Map<String, Object> equipementCount = entityService.getEquipementCount(l_id, e_id);
+		Map<String, Object> equipementCount = entityService.getEquipementCount(l_id, null);
+
 		model.addAttribute("labs", labs);
 		model.addAttribute("labId", l_id);
+		model.addAttribute("startDate", start);
+		model.addAttribute("endDate", end);
 		model.addAttribute("equipements", equipements);
 		model.addAttribute("equipementCount", equipementCount);
 		return "dashboard/index";
 	}
 
 	@GetMapping(value = "/indicators")
-	public String getIndicators(Model model,@RequestParam(required = false) Integer l_id) {
+	public String getIndicators(Model model, @RequestParam(required = false) Integer l_id,
+			@RequestParam(required = false) String start, @RequestParam(required = false) String end) {
 		List<Map<String, Object>> labs = labService.getLabsIdAndNames();
+		model.addAttribute("startDate", start);
+		model.addAttribute("endDate", end);
 		model.addAttribute("labs", labs);
 		model.addAttribute("labId", l_id);
 		return "dashboard/indicators";
@@ -57,32 +66,29 @@ public class DashboardController {
 
 	@GetMapping(value = "/equipement_by_name")
 	public ResponseEntity<List<Map<String, Object>>> getEquipementCountByName(
-			@RequestParam(required = false) Integer l_id, @RequestParam(required = false) Integer e_id) {
+			@RequestParam(required = false, defaultValue = "0") Integer l_id) {
 		Integer labIb = (l_id == 0) ? null : l_id;
-		Integer equipementId = (e_id == 0) ? null : e_id;
 
-		List<Map<String, Object>> e = entityService.getEquipementCountByEquipement(labIb, equipementId);
+		List<Map<String, Object>> e = entityService.getEquipementCountByEquipement(labIb, null);
 
 		return new ResponseEntity<>(e, HttpStatus.OK);
 	}
 
 	@GetMapping(value = "/equipement_by_lab_type")
 	public ResponseEntity<List<Map<String, Object>>> getEquipementCountByLabType(
-			@RequestParam(required = false) Integer l_id, @RequestParam(required = false) Integer e_id) {
+			@RequestParam(required = false, defaultValue = "0") Integer l_id) {
 		Integer labIb = (l_id == 0) ? null : l_id;
-		Integer equipementId = (e_id == 0) ? null : e_id;
 
-		List<Map<String, Object>> e = entityService.getEquipementCountByLabType(labIb, equipementId);
+		List<Map<String, Object>> e = entityService.getEquipementCountByLabType(labIb, null);
 		return new ResponseEntity<>(e, HttpStatus.OK);
 	}
 
 	@GetMapping(value = "/equipement_warrant")
-	public ResponseEntity<List<Map<String, Object>>> getEquipementWarrant(@RequestParam(required = false) Integer l_id,
-			@RequestParam(required = false) Integer e_id) {
+	public ResponseEntity<List<Map<String, Object>>> getEquipementWarrant(
+			@RequestParam(required = false, defaultValue = "0") Integer l_id) {
 		Integer labIb = (l_id == 0) ? null : l_id;
-		Integer equipementId = (e_id == 0) ? null : e_id;
 
-		Map<String, Object> e = entityService.getEquipementWarrant(labIb, equipementId);
+		Map<String, Object> e = entityService.getEquipementWarrant(labIb, null);
 		List<Map<String, Object>> res = new ArrayList<Map<String, Object>>();
 		Map<String, String> legend = new HashMap<String, String>();
 		legend.put("all", "Total");
@@ -98,137 +104,222 @@ public class DashboardController {
 	}
 
 	@GetMapping(value = "/panne_type")
-	public ResponseEntity<List<Map<String, Object>>> getPanneByType(@RequestParam(required = false) Integer l_id,
-			@RequestParam(required = false) Integer e_id) {
+	public ResponseEntity<List<Map<String, Object>>> getPanneByType(
+			@RequestParam(required = false, defaultValue = "0") Integer l_id,
+			@RequestParam(required = false) String start, @RequestParam(required = false) String end) {
 		Integer labIb = (l_id == 0) ? null : l_id;
-		Integer equipementId = (e_id == 0) ? null : e_id;
-
-		List<Map<String, Object>> e = entityService.getPanneByType(labIb, equipementId);
+		SimpleDateFormat df1 = new SimpleDateFormat("dd/mm/yyyy");
 		List<Map<String, Object>> res = new ArrayList<Map<String, Object>>();
-		Map<String, String> legend = new HashMap<String, String>();
-		legend.put("1", "Mineure");
-		legend.put("2", "Critique");
-		legend.put("3", "Majeure (Arrêt)");
-		e.stream().map(el -> el.replace("name", legend.get(el.get("name"))));
-		e.forEach(el -> {
-			Map<String, Object> m = new HashMap<String, Object>();
-			m.put("name", legend.get(el.get("name")));
-			m.put("y", el.get("y"));
-			res.add(m);
-		});
+		try {
+			Date startDate = ObjectUtils.isNotEmpty(start) ? df1.parse(start) : null;
+			Date endDate = ObjectUtils.isNotEmpty(end) ? df1.parse(end) : null;
+			List<Map<String, Object>> e = entityService.getPanneByType(labIb, null, startDate, endDate);
+			Map<String, String> legend = new HashMap<String, String>();
+			legend.put("1", "Mineure");
+			legend.put("2", "Critique");
+			legend.put("3", "Majeure (Arrêt)");
+			legend.put("", "N/A");
+			e.stream().map(el -> el.replace("name", legend.get(el.get("name"))));
+			e.forEach(el -> {
+				Map<String, Object> m = new HashMap<String, Object>();
+				m.put("name", legend.get(el.get("name")));
+				m.put("y", el.get("y"));
+				res.add(m);
+			});
+		} catch (Exception ex) {
+			ex.printStackTrace();
+			throw new OperationFailedException(ex.getMessage());
+		}
 		return new ResponseEntity<>(res, HttpStatus.OK);
 	}
 
 	@GetMapping(value = "/preventive_maintenance")
-	public ResponseEntity<Map<String, Object>> getPreventiveMaintenance(@RequestParam(required = false) Integer l_id) {
+	public ResponseEntity<Map<String, Object>> getPreventiveMaintenance(
+			@RequestParam(required = false, defaultValue = "0") Integer l_id,
+			@RequestParam(required = false) String start, @RequestParam(required = false) String end) {
 		Integer labIb = (l_id == 0) ? null : l_id;
-//		Integer equipementId = (e_id == 0) ? null : e_id;
-
-		List<Map<String, Object>> e1 = entityService.getMaintenancePlanning(labIb);
-		List<Map<String, Object>> e2 = entityService.getPreventiveMaintenanceDone(labIb);
 		Map<String, Object> res = new HashMap<String, Object>();
+		SimpleDateFormat df1 = new SimpleDateFormat("dd/mm/yyyy");
+		try {
+			Date startDate = ObjectUtils.isNotEmpty(start) ? df1.parse(start) : null;
+			Date endDate = ObjectUtils.isNotEmpty(end) ? df1.parse(end) : null;
+			List<Map<String, Object>> e1 = entityService.getMaintenancePlanning(labIb, startDate, endDate);
+			List<Map<String, Object>> e2 = entityService.getPreventiveMaintenanceDone(labIb, startDate, endDate);
 
-		List<Object> categories = new ArrayList<Object>();
-		List<Object> prev = new ArrayList<Object>();
-		List<Object> done = new ArrayList<Object>();
-		e1.forEach(el -> {
-			categories.add(el.get("name"));
-			prev.add(el.get("y"));
-		});
-		e2.forEach(el -> {
-			done.add(el.get("y"));
-		});
-		res.put("categories", categories);
-		res.put("prev", prev);
-		res.put("done", done);
+			List<Object> categories = new ArrayList<Object>();
+			List<Object> prev = new ArrayList<Object>();
+			List<Object> done = new ArrayList<Object>();
+			e1.forEach(el -> {
+				categories.add(el.get("name"));
+				prev.add(el.get("y"));
+			});
+			e2.forEach(el -> {
+				done.add(el.get("y"));
+			});
+			res.put("categories", categories);
+			res.put("prev", prev);
+			res.put("done", done);
+		} catch (Exception ex) {
+			ex.printStackTrace();
+			throw new OperationFailedException(ex.getMessage());
+		}
 		return new ResponseEntity<>(res, HttpStatus.OK);
 	}
 
 	@GetMapping(value = "/curative_maintenance")
-	public ResponseEntity<Map<String, Object>> getCurativeMaintenance(@RequestParam(required = false) Integer l_id) {
+	public ResponseEntity<Map<String, Object>> getCurativeMaintenance(
+			@RequestParam(required = false, defaultValue = "0") Integer l_id,
+			@RequestParam(required = false) String start, @RequestParam(required = false) String end) {
 		Integer labIb = (l_id == 0) ? null : l_id;
-
-		List<Map<String, Object>> e = entityService.getCurativeMaintenance(labIb);
+		SimpleDateFormat df1 = new SimpleDateFormat("dd/mm/yyyy");
 		Map<String, Object> res = new HashMap<String, Object>();
+		try {
+			Date startDate = ObjectUtils.isNotEmpty(start) ? df1.parse(start) : null;
+			Date endDate = ObjectUtils.isNotEmpty(end) ? df1.parse(end) : null;
 
-		List<Object> categories = new ArrayList<Object>();
-		List<Object> done = new ArrayList<Object>();
-		e.forEach(el -> {
-			categories.add(el.get("name"));
-			done.add(el.get("y"));
-		});
+			List<Map<String, Object>> e = entityService.getCurativeMaintenance(labIb, startDate, endDate);
 
-		res.put("categories", categories);
-		res.put("done", done);
+			List<Object> categories = new ArrayList<Object>();
+			List<Object> done = new ArrayList<Object>();
+			e.forEach(el -> {
+				categories.add(el.get("name"));
+				done.add(el.get("y"));
+			});
+
+			res.put("categories", categories);
+			res.put("done", done);
+		} catch (Exception ex) {
+			ex.printStackTrace();
+			throw new OperationFailedException(ex.getMessage());
+		}
 		return new ResponseEntity<>(res, HttpStatus.OK);
 	}
 
 	@GetMapping(value = "/equipement_by_maintenance_type")
 	public ResponseEntity<List<Map<String, Object>>> getEquipementCountByMaintenanceType(
-			@RequestParam(required = false) Integer l_id, @RequestParam(required = false) Integer e_id) {
+			@RequestParam(required = false, defaultValue = "0") Integer l_id,
+			@RequestParam(required = false) String start, @RequestParam(required = false) String end) {
 		Integer labIb = (l_id == 0) ? null : l_id;
-		Integer equipementId = (e_id == 0) ? null : e_id;
+		SimpleDateFormat df1 = new SimpleDateFormat("dd/mm/yyyy");
 
-		List<Map<String, Object>> e = entityService.getMaintenanceByType(labIb, equipementId);
+		List<Map<String, Object>> e = new ArrayList<Map<String, Object>>();
+		try {
+			Date startDate = ObjectUtils.isNotEmpty(start) ? df1.parse(start) : null;
+			Date endDate = ObjectUtils.isNotEmpty(end) ? df1.parse(end) : null;
+			e = entityService.getMaintenanceByType(labIb, null, startDate, endDate);
+		} catch (Exception ex) {
+			ex.printStackTrace();
+			throw new OperationFailedException(ex.getMessage());
+		}
 		return new ResponseEntity<>(e, HttpStatus.OK);
 	}
 
 	@GetMapping(value = "/total_breakdown_time")
 	public ResponseEntity<List<Map<String, Object>>> getTotalBreakdownTime(
-			@RequestParam(required = false) Integer l_id) {
+			@RequestParam(required = false, defaultValue = "0") Integer l_id,
+			@RequestParam(required = false) String start, @RequestParam(required = false) String end) {
 		Integer labIb = (l_id == 0) ? null : l_id;
+		SimpleDateFormat df1 = new SimpleDateFormat("dd/mm/yyyy");
+		List<Map<String, Object>> e = new ArrayList<Map<String, Object>>();
 
-		List<Map<String, Object>> e = entityService.getTotalBreakdownTime(labIb);
+		try {
+			Date startDate = ObjectUtils.isNotEmpty(start) ? df1.parse(start) : null;
+			Date endDate = ObjectUtils.isNotEmpty(end) ? df1.parse(end) : null;
+			e = entityService.getTotalBreakdownTime(labIb, startDate, endDate);
+		} catch (Exception ex) {
+			ex.printStackTrace();
+			throw new OperationFailedException(ex.getMessage());
+		}
 		return new ResponseEntity<>(e, HttpStatus.OK);
 	}
 
 	@GetMapping(value = "/total_repair_time")
-	public ResponseEntity<List<Map<String, Object>>> getTotalRepairTime(@RequestParam(required = false) Integer l_id) {
+	public ResponseEntity<List<Map<String, Object>>> getTotalRepairTime(
+			@RequestParam(required = false, defaultValue = "0") Integer l_id,
+			@RequestParam(required = false) String start, @RequestParam(required = false) String end) {
 		Integer labIb = (l_id == 0) ? null : l_id;
+		SimpleDateFormat df1 = new SimpleDateFormat("dd/mm/yyyy");
 
-		List<Map<String, Object>> e = entityService.getTotalRepairTime(labIb);
+		List<Map<String, Object>> e = new ArrayList<Map<String, Object>>();
+		try {
+			Date startDate = ObjectUtils.isNotEmpty(start) ? df1.parse(start) : null;
+			Date endDate = ObjectUtils.isNotEmpty(end) ? df1.parse(end) : null;
+			e = entityService.getTotalRepairTime(labIb, startDate, endDate);
+		} catch (Exception ex) {
+			ex.printStackTrace();
+			throw new OperationFailedException(ex.getMessage());
+		}
 		return new ResponseEntity<>(e, HttpStatus.OK);
 	}
 
 	@GetMapping(value = "/mtbf")
-	public ResponseEntity<List<Map<String, Object>>> getMTBF(@RequestParam(required = false) Integer l_id) {
+	public ResponseEntity<List<Map<String, Object>>> getMTBF(
+			@RequestParam(required = false, defaultValue = "0") Integer l_id,
+			@RequestParam(required = false) String start, @RequestParam(required = false) String end) {
 		Integer labIb = (l_id == 0) ? null : l_id;
+		SimpleDateFormat df1 = new SimpleDateFormat("dd/mm/yyyy");
 
-		List<Map<String, Object>> e = entityService.getMeanTimeBetweenFailure(labIb);
+		List<Map<String, Object>> e = new ArrayList<Map<String, Object>>();
+		try {
+			Date startDate = ObjectUtils.isNotEmpty(start) ? df1.parse(start) : null;
+			Date endDate = ObjectUtils.isNotEmpty(end) ? df1.parse(end) : null;
+			e = entityService.getMeanTimeBetweenFailure(labIb, startDate, endDate);
+		} catch (Exception ex) {
+			ex.printStackTrace();
+			throw new OperationFailedException(ex.getMessage());
+		}
 		return new ResponseEntity<>(e, HttpStatus.OK);
 	}
 
 	@GetMapping(value = "/mttr")
-	public ResponseEntity<Map<String, Object>> getMTTR(@RequestParam(required = false) Integer l_id) {
+	public ResponseEntity<Map<String, Object>> getMTTR(@RequestParam(required = false, defaultValue = "0") Integer l_id,
+			@RequestParam(required = false) String start, @RequestParam(required = false) String end) {
 		Integer labIb = (l_id == 0) ? null : l_id;
-
-		List<Map<String, Object>> e1 = entityService.getMeanTimeToRepair(labIb);
-		List<Map<String, Object>> e2 = entityService.getReparationMeanTime(labIb);
-
+		SimpleDateFormat df1 = new SimpleDateFormat("dd/mm/yyyy");
 		Map<String, Object> res = new HashMap<String, Object>();
 
-		List<Object> categories = new ArrayList<Object>();
-		List<Object> TimeToRepair = new ArrayList<Object>();
-		List<Object> ReparationTime = new ArrayList<Object>();
-		e1.forEach(el -> {
-			categories.add(el.get("name"));
-			TimeToRepair.add(el.get("y"));
-		});
-		e2.forEach(el -> {
-			ReparationTime.add(el.get("y"));
-		});
-		res.put("categories", categories);
-		res.put("TimeToRepair", TimeToRepair);
-		res.put("ReparationTime", ReparationTime);
+		try {
+			Date startDate = ObjectUtils.isNotEmpty(start) ? df1.parse(start) : null;
+			Date endDate = ObjectUtils.isNotEmpty(end) ? df1.parse(end) : null;
+			List<Map<String, Object>> e1 = entityService.getMeanTimeToRepair(labIb, startDate, endDate);
+			List<Map<String, Object>> e2 = entityService.getReparationMeanTime(labIb, startDate, endDate);
+
+			List<Object> categories = new ArrayList<Object>();
+			List<Object> TimeToRepair = new ArrayList<Object>();
+			List<Object> ReparationTime = new ArrayList<Object>();
+			e1.forEach(el -> {
+				categories.add(el.get("name"));
+				TimeToRepair.add(el.get("y"));
+			});
+			e2.forEach(el -> {
+				ReparationTime.add(el.get("y"));
+			});
+			res.put("categories", categories);
+			res.put("TimeToRepair", TimeToRepair);
+			res.put("ReparationTime", ReparationTime);
+		} catch (Exception ex) {
+			ex.printStackTrace();
+			throw new OperationFailedException(ex.getMessage());
+		}
 		return new ResponseEntity<>(res, HttpStatus.OK);
 	}
 
 	@GetMapping(value = "/availability")
 	public ResponseEntity<List<Map<String, Object>>> getEquipementAvailability(
-			@RequestParam(required = false) Integer l_id) {
+			@RequestParam(required = false, defaultValue = "0") Integer l_id,
+			@RequestParam(required = false) String start, @RequestParam(required = false) String end) {
 		Integer labIb = (l_id == 0) ? null : l_id;
+		SimpleDateFormat df1 = new SimpleDateFormat("dd/mm/yyyy");
 
-		List<Map<String, Object>> e = entityService.getAvailability(labIb);
+		List<Map<String, Object>> e = new ArrayList<Map<String, Object>>();
+		try {
+			Date startDate = ObjectUtils.isNotEmpty(start) ? df1.parse(start) : null;
+			Date endDate = ObjectUtils.isNotEmpty(end) ? df1.parse(end) : null;
+			e = entityService.getAvailability(labIb, startDate, endDate);
+		} catch (Exception ex) {
+			ex.printStackTrace();
+			throw new OperationFailedException(ex.getMessage());
+		}
 		return new ResponseEntity<>(e, HttpStatus.OK);
 	}
 

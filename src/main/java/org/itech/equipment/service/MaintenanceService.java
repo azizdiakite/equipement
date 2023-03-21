@@ -14,6 +14,8 @@ public interface MaintenanceService {
 	Maintenance create(Maintenance d);
 
 	Maintenance update(Maintenance d);
+	
+	Maintenance findByPanne(Integer panneId);
 
 	Maintenance createOrUpdate(Maintenance d);
 

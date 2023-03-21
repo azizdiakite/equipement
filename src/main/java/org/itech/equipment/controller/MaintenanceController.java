@@ -42,21 +42,41 @@ public class MaintenanceController {
 
 	@PostMapping(value = "")
 	public String createMaintenance(@Valid MaintenanceDTO maintenance) {
+		if (ObjectUtils.isNotEmpty(maintenance.getMaintenance().getId())) {
+			return this.editMaintenance(maintenance);
+		}
 		LabHasEquipement oldEq = labEquipementService.getOne(maintenance.getMaintenance().getLabHasEquipementId());
 		if (oldEq.getStatus() == Equipement.STATUS_CURRENT_MAINTENANCE) {
 			throw new OperationFailedException("Maintenance déjà en cours pour cet équipement");
 		}
-		if (oldEq.getStatus() != Equipement.STATUS_BREAK) {
+		if (oldEq.getStatus() != Equipement.STATUS_BREAK && maintenance.getMaintenance().getType().equals("CURATIVE")) {
 			throw new OperationFailedException("Panne non notifiée pour cet équipement");
 		}
 		Panne p = panneService.getLastForEquipement(oldEq.getId());
-		if (ObjectUtils.isEmpty(p)) {
+		boolean isPanneExist = ObjectUtils.isNotEmpty(maintenance.getMaintenance().getPanneId())
+				|| ObjectUtils.isNotEmpty(p);
+		if (ObjectUtils.isEmpty(maintenance.getMaintenance().getId())
+				&& maintenance.getMaintenance().getType().equals("CURATIVE") && !isPanneExist) {
 			throw new OperationFailedException("Panne non identifiée pour cette maintenance curative");
 		}
-		boolean isPanneExist = ObjectUtils.isNotEmpty(maintenance.getMaintenance().getPanneId())
-				|| ObjectUtils.isNotEmpty(p.getId());
-		if (maintenance.getMaintenance().getType().equals("CURATIVE") && !isPanneExist) {
-			throw new OperationFailedException("Panne non identifiée pour cette maintenance curative");
+		Maintenance m = entityService.createOrUpdate(maintenance.getMaintenance());
+		if (ObjectUtils.isNotEmpty(m)) {
+			LabHasEquipement eq = labEquipementService.getOne(m.getLabHasEquipementId());
+			if (ObjectUtils.isEmpty(m.getEndDate())) {
+				eq.setStatus(Equipement.STATUS_CURRENT_MAINTENANCE);
+			} else {
+				// eq.setStatus(maintenance.getStatus());
+				eq.setStatus(Equipement.STATUS_OK);
+			}
+			labEquipementService.createOrUpdate(eq);
+		}
+		return "redirect:/maintenance";
+	}
+
+	@PostMapping(value = "/edit")
+	public String editMaintenance(@Valid MaintenanceDTO maintenance) {
+		if (ObjectUtils.isEmpty(maintenance.getMaintenance().getId())) {
+			this.createMaintenance(maintenance);
 		}
 		Maintenance m = entityService.createOrUpdate(maintenance.getMaintenance());
 		if (ObjectUtils.isNotEmpty(m)) {
@@ -99,7 +119,7 @@ public class MaintenanceController {
 		model.addAttribute("maintenance", maintenanceDTO);
 		model.addAttribute("labs", labs);
 		model.addAttribute("all", all);
-		model.addAttribute("mode", 0); // add a new entry
+		model.addAttribute("mode", ObjectUtils.isNotEmpty(maintenanceId) ? 1 : 0); // add or edit an entry
 		// System.out.println(equipement);
 		return "maintenance/index";
 	}

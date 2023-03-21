@@ -4,6 +4,9 @@
  * @author Pascal
  */
 package org.itech.equipment.repository;
+import java.util.Date;
+import java.util.List;
+
 import org.itech.equipment.model.MaintenancePlanning;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
@@ -19,4 +22,5 @@ import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 
 public interface MaintenancePlanningRepository  extends JpaRepository<MaintenancePlanning, Integer> , JpaSpecificationExecutor<MaintenancePlanning> {
 
+	public List<MaintenancePlanning> findByLabHasEquipementIdAndDate(Integer labHasEquipementId, Date date);
 }

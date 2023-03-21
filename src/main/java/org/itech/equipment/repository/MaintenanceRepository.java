@@ -25,4 +25,6 @@ public interface MaintenanceRepository
 
 	@Query(value = "SELECT p FROM Maintenance p JOIN p.labHasEquipement le WHERE le.status = 3")
 	public List<Maintenance> getPending();
+	
+	public Maintenance findByPanneId(Integer panneId);
 }

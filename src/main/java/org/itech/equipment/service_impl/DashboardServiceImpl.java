@@ -1,6 +1,8 @@
 package org.itech.equipment.service_impl;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -97,7 +99,7 @@ public class DashboardServiceImpl implements DashboardService {
 	public List<Map<String, Object>> getEquipementCountByLabType(Integer labId, Integer equipementId) {
 		StringBuffer sql = new StringBuffer("");
 		sql.append("SELECT l.lab_type type, count(labEquip.id) n"
-				+ " FROM lab_has_equipement labEquip JOIN lab l ON l.id = labEquip.lab_id RIGHT JOIN "
+				+ " FROM lab_has_equipement labEquip JOIN lab l ON l.id = labEquip.lab_id JOIN "
 				+ " equipement e ON e.id = labEquip.equipement_id WHERE 1 ");
 
 		if (ObjectUtils.isNotEmpty(labId)) {
@@ -165,7 +167,7 @@ public class DashboardServiceImpl implements DashboardService {
 	}
 
 	@Override
-	public List<Map<String, Object>> getMaintenanceByType(Integer labId, Integer equipementId) {
+	public List<Map<String, Object>> getMaintenanceByType(Integer labId, Integer equipementId, Date start, Date end) {
 		StringBuffer sql = new StringBuffer("");
 		sql.append("SELECT m.type, COUNT(*) FROM lab_has_equipement le JOIN lab l ON l.id = le.lab_id "
 				+ " JOIN maintenance m ON le.id = m.id JOIN equipement e ON e.id = le.equipement_id WHERE 1 ");
@@ -175,6 +177,13 @@ public class DashboardServiceImpl implements DashboardService {
 		}
 		if (ObjectUtils.isNotEmpty(equipementId)) {
 			sql.append(" AND e.id = ").append(equipementId);
+		}
+		if (ObjectUtils.isNotEmpty(start)) {
+			sql.append(" AND m.start_date >= ").append(start);
+		}
+
+		if (ObjectUtils.isNotEmpty(end)) {
+			sql.append(" AND m.end_date <= ").append(end);
 		}
 		sql.append(" GROUP BY m.type");
 
@@ -196,7 +205,8 @@ public class DashboardServiceImpl implements DashboardService {
 	}
 
 	@Override
-	public List<Map<String, Object>> getPanneByType(Integer labId, Integer equipementId) {
+	public List<Map<String, Object>> getPanneByType(Integer labId, Integer equipementId, Date start, Date end) {
+		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-mm-dd");
 		StringBuffer sql = new StringBuffer("");
 		sql.append("SELECT  p.type,COUNT(p.id) FROM  panne p "
 				+ " JOIN lab_has_equipement le ON p.lab_has_equipement_id = le.id "
@@ -208,9 +218,16 @@ public class DashboardServiceImpl implements DashboardService {
 		if (ObjectUtils.isNotEmpty(equipementId)) {
 			sql.append(" AND eq.id = ").append(equipementId);
 		}
+		if (ObjectUtils.isNotEmpty(start)) {
+			sql.append(" AND p.date >= '").append(sdf.format(start) + "'");
+		}
+
+		if (ObjectUtils.isNotEmpty(end)) {
+			sql.append(" AND p.date <= '").append(sdf.format(end) + "'");
+		}
 		sql.append(" GROUP BY p.type ORDER BY p.type");
 
-		// System.out.println(sql);
+		//System.out.println(sql);
 		List<Map<String, Object>> response = new ArrayList<Map<String, Object>>();
 		try {
 			Query query = em.createNativeQuery(sql.toString());
@@ -228,7 +245,8 @@ public class DashboardServiceImpl implements DashboardService {
 	}
 
 	@Override
-	public List<Map<String, Object>> getMaintenancePlanning(Integer labId) {
+	public List<Map<String, Object>> getMaintenancePlanning(Integer labId, Date start, Date end) {
+		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-mm-dd");
 		StringBuffer sql = new StringBuffer("");
 		sql.append("SELECT eq.equipement_name,COUNT(mp.id) FROM maintenance_planning mp JOIN "
 				+ " lab_has_equipement le ON mp.lab_has_equipement_id = le.id "
@@ -237,9 +255,16 @@ public class DashboardServiceImpl implements DashboardService {
 		if (ObjectUtils.isNotEmpty(labId)) {
 			sql.append(" AND le.lab_id = ").append(labId);
 		}
+		if (ObjectUtils.isNotEmpty(start)) {
+			sql.append(" AND mp.date >= '").append(sdf.format(start) + "'");
+		}
+
+		if (ObjectUtils.isNotEmpty(end)) {
+			sql.append(" AND mp.date <= '").append(sdf.format(end) + "'");
+		}
 		sql.append(" GROUP BY eq.equipement_name ORDER BY eq.equipement_name");
 
-		// System.out.println(sql);
+		//System.out.println(sql);
 		List<Map<String, Object>> response = new ArrayList<Map<String, Object>>();
 		try {
 			Query query = em.createNativeQuery(sql.toString());
@@ -257,7 +282,8 @@ public class DashboardServiceImpl implements DashboardService {
 	}
 
 	@Override
-	public List<Map<String, Object>> getPreventiveMaintenanceDone(Integer labId) {
+	public List<Map<String, Object>> getPreventiveMaintenanceDone(Integer labId, Date start, Date end) {
+		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-mm-dd");
 		StringBuffer sql = new StringBuffer("");
 		sql.append(" SELECT eq.equipement_name,COUNT(m.id) FROM "
 				+ " (SELECT * FROM maintenance WHERE type='PREVENTIVE') m RIGHT JOIN "
@@ -267,6 +293,14 @@ public class DashboardServiceImpl implements DashboardService {
 		if (ObjectUtils.isNotEmpty(labId)) {
 			sql.append(" AND le.lab_id = ").append(labId);
 		}
+		if (ObjectUtils.isNotEmpty(start)) {
+			sql.append(" AND m.start_date >= '").append(sdf.format(start) + "'");
+		}
+
+		if (ObjectUtils.isNotEmpty(end)) {
+			sql.append(" AND m.end_date <= '").append(sdf.format(end) + "'");
+		}
+
 		sql.append(" GROUP BY eq.equipement_name ORDER BY eq.equipement_name");
 
 		// System.out.println(sql);
@@ -287,7 +321,8 @@ public class DashboardServiceImpl implements DashboardService {
 	}
 
 	@Override
-	public List<Map<String, Object>> getCurativeMaintenance(Integer labId) {
+	public List<Map<String, Object>> getCurativeMaintenance(Integer labId, Date start, Date end) {
+		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-mm-dd");
 		StringBuffer sql = new StringBuffer("");
 		sql.append("  SELECT eq.equipement_name,COUNT(m.id) FROM "
 				+ " (SELECT * FROM maintenance WHERE type='CURATIVE') m JOIN "
@@ -296,6 +331,13 @@ public class DashboardServiceImpl implements DashboardService {
 
 		if (ObjectUtils.isNotEmpty(labId)) {
 			sql.append(" AND le.lab_id = ").append(labId);
+		}
+		if (ObjectUtils.isNotEmpty(start)) {
+			sql.append(" AND m.start_date >= '").append(sdf.format(start) + "'");
+		}
+
+		if (ObjectUtils.isNotEmpty(end)) {
+			sql.append(" AND m.end_date <= '").append(sdf.format(end) + "'");
 		}
 		sql.append(" GROUP BY eq.equipement_name ORDER BY eq.equipement_name");
 
@@ -316,7 +358,8 @@ public class DashboardServiceImpl implements DashboardService {
 	}
 
 	@Override
-	public List<Map<String, Object>> getTotalBreakdownTime(Integer labId) {
+	public List<Map<String, Object>> getTotalBreakdownTime(Integer labId, Date start, Date end) {
+		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-mm-dd");
 		StringBuffer sql = new StringBuffer("");
 		sql.append(" SELECT eq.equipement_name, "
 				+ " SUM(TIMESTAMPDIFF(DAY,IF(p.date IS NULL,CURDATE(),p.date), IF(m.end_date IS NULL,CURDATE(),m.end_date))) 'break_days' "
@@ -326,6 +369,13 @@ public class DashboardServiceImpl implements DashboardService {
 
 		if (ObjectUtils.isNotEmpty(labId)) {
 			sql.append(" AND le.lab_id = ").append(labId);
+		}
+		if (ObjectUtils.isNotEmpty(start)) {
+			sql.append(" AND p.date >= '").append(sdf.format(start) + "'");
+		}
+
+		if (ObjectUtils.isNotEmpty(end)) {
+			sql.append(" AND p.date <= '").append(sdf.format(end) + "'");
 		}
 
 		sql.append(" GROUP BY eq.equipement_name ORDER BY 'break_days' DESC");
@@ -347,7 +397,8 @@ public class DashboardServiceImpl implements DashboardService {
 	}
 
 	@Override
-	public List<Map<String, Object>> getTotalRepairTime(Integer labId) {
+	public List<Map<String, Object>> getTotalRepairTime(Integer labId, Date start, Date end) {
+		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-mm-dd");
 		StringBuffer sql = new StringBuffer("");
 		sql.append("SELECT  eq.equipement_name,"
 				+ " SUM(TIMESTAMPDIFF(DAY,IF(p.contractor_inform_date IS NULL,p.report_date,p.contractor_inform_date), IF(m.end_date IS NULL,CURDATE(),m.end_date))) 'maintenance_days'"
@@ -357,6 +408,13 @@ public class DashboardServiceImpl implements DashboardService {
 
 		if (ObjectUtils.isNotEmpty(labId)) {
 			sql.append(" AND le.lab_id = ").append(labId);
+		}
+		if (ObjectUtils.isNotEmpty(start)) {
+			sql.append(" AND p.date >= '").append(sdf.format(start) + "'");
+		}
+
+		if (ObjectUtils.isNotEmpty(end)) {
+			sql.append(" AND p.date <= '").append(sdf.format(end) + "'");
 		}
 
 		sql.append(" GROUP BY eq.equipement_name ORDER BY 'maintenance_days' DESC");
@@ -378,10 +436,11 @@ public class DashboardServiceImpl implements DashboardService {
 	}
 
 	@Override
-	public List<Map<String, Object>> getMeanTimeBetweenFailure(Integer labId) {
+	public List<Map<String, Object>> getMeanTimeBetweenFailure(Integer labId, Date start, Date end) {
+		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-mm-dd");
 		StringBuffer sql = new StringBuffer("");
 		sql.append("SELECT eq.equipement_name, "
-				+ " (SUM(TIMESTAMPDIFF(DAY,IF(le.installation_date IS NULL,CURDATE(),le.installation_date), CURDATE())) - SUM(TIMESTAMPDIFF(DAY,IF(p.date IS NULL,CURDATE(),p.date), IF(m.end_date IS NULL,CURDATE(),m.end_date)))) / COUNT(p.id) 'days'"
+				+ " ROUND((SUM(TIMESTAMPDIFF(DAY,IF(le.installation_date IS NULL,CURDATE(),le.installation_date), CURDATE())) - SUM(TIMESTAMPDIFF(DAY,IF(p.date IS NULL,CURDATE(),p.date), IF(m.end_date IS NULL,CURDATE(),m.end_date)))) / COUNT(p.id),0) 'days'"
 				+ " FROM  panne p JOIN lab_has_equipement le ON p.lab_has_equipement_id = le.id "
 				+ " LEFT JOIN (SELECT * FROM maintenance WHERE type='CURATIVE') m ON m.lab_has_equipement_id = le.id "
 				+ " RIGHT JOIN equipement eq ON eq.id = le.equipement_id WHERE 1 ");
@@ -389,6 +448,13 @@ public class DashboardServiceImpl implements DashboardService {
 		if (ObjectUtils.isNotEmpty(labId)) {
 			sql.append(" AND le.lab_id = ").append(labId);
 		}
+		if (ObjectUtils.isNotEmpty(start)) {
+			sql.append(" AND p.date >= '").append(sdf.format(start) + "'");
+		}
+
+		if (ObjectUtils.isNotEmpty(end)) {
+			sql.append(" AND p.date <= '").append(sdf.format(end) + "'");
+		}
 
 		sql.append(" GROUP BY eq.equipement_name ORDER BY 'days' DESC");
 
@@ -409,10 +475,11 @@ public class DashboardServiceImpl implements DashboardService {
 	}
 
 	@Override
-	public List<Map<String, Object>> getMeanTimeToRepair(Integer labId) {
+	public List<Map<String, Object>> getMeanTimeToRepair(Integer labId, Date start, Date end) {
+		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-mm-dd");
 		StringBuffer sql = new StringBuffer("");
 		sql.append("SELECT eq.equipement_name, "
-				+ " (SUM(TIMESTAMPDIFF(DAY,IF(p.contractor_inform_date IS NULL,p.report_date,p.contractor_inform_date), IF( m.end_date IS NULL,CURDATE(), m.end_date)))) / COUNT(m.id) 'days'"
+				+ " ROUND((SUM(TIMESTAMPDIFF(DAY,IF(p.contractor_inform_date IS NULL,p.report_date,p.contractor_inform_date), IF( m.end_date IS NULL,CURDATE(), m.end_date)))) / COUNT(m.id),0) 'days'"
 				+ " FROM (SELECT * FROM maintenance WHERE type='CURATIVE') m  "
 				+ " JOIN lab_has_equipement le ON m.lab_has_equipement_id = le.id "
 				+ " JOIN panne p ON p.lab_has_equipement_id = le.id "
@@ -420,6 +487,14 @@ public class DashboardServiceImpl implements DashboardService {
 
 		if (ObjectUtils.isNotEmpty(labId)) {
 			sql.append(" AND le.lab_id = ").append(labId);
+		}
+
+		if (ObjectUtils.isNotEmpty(start)) {
+			sql.append(" AND p.date >= '").append(sdf.format(start) + "'");
+		}
+
+		if (ObjectUtils.isNotEmpty(end)) {
+			sql.append(" AND p.date <= '").append(sdf.format(end) + "'");
 		}
 
 		sql.append(" GROUP BY eq.equipement_name ORDER BY 'days' DESC");
@@ -441,10 +516,11 @@ public class DashboardServiceImpl implements DashboardService {
 	}
 
 	@Override
-	public List<Map<String, Object>> getReparationMeanTime(Integer labId) {
+	public List<Map<String, Object>> getReparationMeanTime(Integer labId, Date start, Date end) {
+		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-mm-dd");
 		StringBuffer sql = new StringBuffer("");
 		sql.append("  SELECT eq.equipement_name, "
-				+ " (SUM(TIMESTAMPDIFF(DAY,IF(m.start_date IS NULL,CURDATE(),m.start_date), IF( m.end_date IS NULL,CURDATE(), m.end_date)))) / COUNT(m.id) 'days' "
+				+ " ROUND((SUM(TIMESTAMPDIFF(DAY,IF(m.start_date IS NULL,CURDATE(),m.start_date), IF( m.end_date IS NULL,CURDATE(), m.end_date)))) / COUNT(m.id),0) 'days' "
 				+ " FROM (SELECT * FROM maintenance WHERE type='CURATIVE') m  "
 				+ " JOIN lab_has_equipement le ON m.lab_has_equipement_id = le.id "
 				+ " JOIN panne p ON p.lab_has_equipement_id = le.id "
@@ -453,6 +529,15 @@ public class DashboardServiceImpl implements DashboardService {
 		if (ObjectUtils.isNotEmpty(labId)) {
 			sql.append(" AND le.lab_id = ").append(labId);
 		}
+
+		if (ObjectUtils.isNotEmpty(start)) {
+			sql.append(" AND p.date >= '").append(sdf.format(start) + "'");
+		}
+
+		if (ObjectUtils.isNotEmpty(end)) {
+			sql.append(" AND p.date <= '").append(sdf.format(start) + "'");
+		}
+
 		sql.append(" GROUP BY eq.equipement_name ORDER BY 'days' DESC ");
 
 		List<Map<String, Object>> response = new ArrayList<Map<String, Object>>();
@@ -472,18 +557,26 @@ public class DashboardServiceImpl implements DashboardService {
 	}
 
 	@Override
-	public List<Map<String, Object>> getAvailability(Integer labId) {
+	public List<Map<String, Object>> getAvailability(Integer labId, Date start, Date end) {
+		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-mm-dd");
 		StringBuffer sql = new StringBuffer("");
-		sql.append("   SELECT   equipement_name, (mtbf / (mttr + mtbf)) * 100 'availability' FROM "
+		sql.append(" SELECT   equipement_name, ROUND((mtbf / (mttr + mtbf)) * 100,1) 'availability' FROM "
 				+ "  ( SELECT eq.equipement_name, "
-				+ "   (SUM(TIMESTAMPDIFF(DAY,IF(p.contractor_inform_date IS NULL,p.report_date,p.contractor_inform_date), IF( m.end_date IS NULL,CURDATE(), m.end_date)))) / COUNT(m.id) 'mttr', "
-				+ " (SUM(TIMESTAMPDIFF(DAY,IF(le.installation_date IS NULL,CURDATE(),le.installation_date), CURDATE())) - SUM(TIMESTAMPDIFF(DAY,IF(p.date IS NULL,CURDATE(),p.date), IF(m.end_date IS NULL,CURDATE(),m.end_date)))) / COUNT(p.id) 'mtbf' "
+				+ "   ROUND((SUM(TIMESTAMPDIFF(DAY,IF(p.contractor_inform_date IS NULL,p.report_date,p.contractor_inform_date), IF( m.end_date IS NULL,CURDATE(), m.end_date)))) / COUNT(m.id),0) 'mttr', "
+				+ " ROUND((SUM(TIMESTAMPDIFF(DAY,IF(le.installation_date IS NULL,CURDATE(),le.installation_date), CURDATE())) - SUM(TIMESTAMPDIFF(DAY,IF(p.date IS NULL,CURDATE(),p.date), IF(m.end_date IS NULL,CURDATE(),m.end_date)))) / COUNT(p.id),0) 'mtbf' "
 				+ " FROM  panne p JOIN lab_has_equipement le ON p.lab_has_equipement_id = le.id "
 				+ " LEFT JOIN (SELECT * FROM maintenance WHERE type='CURATIVE') m ON m.lab_has_equipement_id = le.id "
-				+ " RIGHT JOIN equipement eq ON eq.id = le.equipement_id WHERE 1 " );
+				+ " RIGHT JOIN equipement eq ON eq.id = le.equipement_id WHERE 1 ");
 
 		if (ObjectUtils.isNotEmpty(labId)) {
 			sql.append(" AND le.lab_id = ").append(labId);
+		}
+		if (ObjectUtils.isNotEmpty(start)) {
+			sql.append(" AND p.date >= '").append(sdf.format(start) + "'");
+		}
+
+		if (ObjectUtils.isNotEmpty(end)) {
+			sql.append(" AND p.date <= '").append(sdf.format(end) + "'");
 		}
 		sql.append(" GROUP BY eq.equipement_name) r ORDER BY availability DESC ");
 

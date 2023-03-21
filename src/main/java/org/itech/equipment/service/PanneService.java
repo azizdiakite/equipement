@@ -4,9 +4,11 @@
  */
 package org.itech.equipment.service;
 
+import org.itech.equipment.model.Maintenance;
 import org.itech.equipment.model.Panne;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * <h2>PanneServiceimpl</h2>
@@ -21,9 +23,13 @@ public interface PanneService {
 	Panne getOne(int id);
 
 	List<Panne> getAll();
-	
-	List<Panne> getPending();
-	
+
+	List<Map<String, Object>> getPannes(boolean all);
+
+	List<Maintenance> getAllPannes();
+
+	List<Maintenance> getPending();
+
 	Panne getLastForEquipement(Integer labEquipementId);
 
 	long getTotal();

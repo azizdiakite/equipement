@@ -51,6 +51,7 @@ public class PanneController {
 		Panne p = entityService.createOrUpdate(panne);
 		if (ObjectUtils.isNotEmpty(p)) {
 			LabHasEquipement eq = labEquipementService.getOne(p.getLabHasEquipementId());
+			eq.setStatus(Equipement.STATUS_BREAK);
 //			if (ObjectUtils.isNotEmpty(panne.getContractorInformDate())) {
 //				eq.setStatus(Equipement.STATUS_CURRENT_MAINTENANCE);
 //				Maintenance m = new Maintenance();
@@ -59,9 +60,14 @@ public class PanneController {
 //				m.setType("CURATIVE");
 //				m.setStartDate(p.getContractorInformDate());
 //			} else
-				eq.setStatus(Equipement.STATUS_BREAK);
 			labEquipementService.createOrUpdate(eq);
 		}
+		return "redirect:/panne";
+	}
+
+	@PostMapping(value = "/edit")
+	public String editPanne(@Valid Panne panne) {
+		entityService.createOrUpdate(panne);
 		return "redirect:/panne";
 	}
 
@@ -82,14 +88,15 @@ public class PanneController {
 			}
 		}
 		// List<Panne> pannes = entityService.getAll();
-		List<Panne> pannes = (all == 0) ? entityService.getPending() : entityService.getAll();
+		//List<Maintenance> pannes = (all == 0) ? entityService.getPending() : entityService.getAllPannes();
+		List<Map<String,Object>> pannes =entityService.getPannes(all==1);
 		List<Map<String, Object>> labs = labService.getLabsIdAndNames();
 		model.addAttribute("pannes", pannes);
 		model.addAttribute("equipement", equipement);
 		model.addAttribute("panne", panne);
 		model.addAttribute("labs", labs);
 		model.addAttribute("all", all);
-		model.addAttribute("mode", 0); // add a new entry
+		model.addAttribute("mode", ObjectUtils.isNotEmpty(panneId) ? 1 : 0); // add or edit an entry
 		return "panne/index";
 	}
 

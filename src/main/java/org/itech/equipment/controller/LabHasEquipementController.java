@@ -4,6 +4,7 @@
 package org.itech.equipment.controller;
 
 import org.apache.commons.lang3.ObjectUtils;
+import org.itech.equipment.exception.OperationFailedException;
 import org.itech.equipment.model.Equipement;
 import org.itech.equipment.model.LabHasEquipement;
 import org.itech.equipment.model.Supplier;
@@ -53,18 +54,23 @@ public class LabHasEquipementController {
 	@GetMapping(value = "")
 	public String getAllLabEquipements(Model model, @RequestParam(name = "labId", required = false) Integer labId) {
 
-		List<LabHasEquipement> equipements = new ArrayList<LabHasEquipement>();
-		if (ObjectUtils.isNotEmpty(labId) && labId != -1) {
-			equipements = entityService.findByLabId(labId);
-		} else {
-			equipements = entityService.getAll();
-		}
+		try {
+			List<LabHasEquipement> equipements = new ArrayList<LabHasEquipement>();
+			if (ObjectUtils.isNotEmpty(labId) && labId != -1) {
+				equipements = entityService.findByLabId(labId);
+			} else {
+				equipements = entityService.getAll();
+			}
 
-		List<Map<String, Object>> labs = labService.getLabsIdAndNames();
-		model.addAttribute("equipements", equipements);
-		model.addAttribute("labs", labs);
-		model.addAttribute("labId", labId);
-		return "equipement/lab_equipement";
+			List<Map<String, Object>> labs = labService.getLabsIdAndNames();
+			model.addAttribute("equipements", equipements);
+			model.addAttribute("labs", labs);
+			model.addAttribute("labId", labId);
+			return "equipement/lab_equipement";
+		} catch (Exception e) {
+			e.printStackTrace();
+			throw new OperationFailedException(e.getLocalizedMessage());
+		}
 	}
 
 	@GetMapping(value = { "/edit", "/edit/{id}" })

@@ -19,7 +19,7 @@
 						<div class="card-body">
 
 							<div class="all-form-element-inner">
-								<form th:object="${panne}" th:action="@{/panne}" method="post">
+								<form th:object="${panne}" th:action="@{${mode == 0}?'/panne':'/panne/edit'}" method="post">
 									<div class="row">
 										<div class="mb-3 col-xl-3 col-md-4">
 											<label for="inputLab" class="form-label">Laboratoire:</label>
@@ -68,6 +68,11 @@
 											<input th:field="*{contractorInformDate}" type="text" class="form-control" id="inputContractorInformDate" aria-describedby="inputName" placeholder="">
 											<div class="form-text">Renseigner cette date lorsque le fournisseur est informé de la panne, laisser vide sinon</div>
 										</div>
+										<div class="mb-3 col-xl-3 col-md-4">
+											<label for="panneComment" class="form-label">Autre commentaire sur la panne :</label>
+											<textarea th:field="*{comment}" class="form-control" id="panneComment" aria-describedby="panneComment" placeholder=""> </textarea>
+											<div class="form-text">Renseigner les différentes informations concernant la panne</div>
+										</div>
 									</div>
 									<input type="hidden" th:value="${equipement?.labId}" id="inputLabId">
 									<input type="hidden" th:field="*{id}">
@@ -75,6 +80,7 @@
 										<i class="fas fa-save"></i>
 										&nbsp; &nbsp; Enregistrer
 									</button>
+									<a th:href="@{/panne}" class="btn btn-warning mx-4">Annuler</a>
 								</form>
 							</div>
 
@@ -110,16 +116,18 @@
 								<th>Date de déclaration de la panne</th>
 								<th>Nom du déclarant</th>
 								<th>Date d'information au fournisseur de maintenance</th>
+								<th>Date de réparation</th>
+								<th>Fournisseur</th>
 								<th>Statut de l'équipement</th>
+								<th>Commentaires</th>
 								<th>Options</th>
-								<th>Supprimer</th>
 							</thead>
 							<tbody>
 								<tr th:each="item,idx : ${pannes}">
 									<td th:text="${idx.count}"></td>
-									<td th:text="${item.labHasEquipement.lab.site.name}"></td>
-									<td th:text="${item.labHasEquipement.equipement.equipementName}"></td>
-									<td th:text="${item.labHasEquipement.serialNumber}"></td>
+									<td th:text="${item.labName}"></td>
+									<td th:text="${item.equipementName}"></td>
+									<td th:text="${item.serialNumber}"></td>
 									<td th:switch="*{item.type}">
 										<span th:case="1">MINEURE</span>
 										<span th:case="2">CRITIQUE</span>
@@ -127,28 +135,32 @@
 										<span th:case="*" th:text="*{item.type}"></span>
 									</td>
 									<td th:text="${item.description}"></td>
-									<td th:text="${#dates.format(item.date,'dd/MM/yyyy')}"></td>
-									<td th:text="${#dates.format(item.reportDate,'dd/MM/yyyy')}"></td>
-									<td th:text="${item.reporterName}"></td>
+									<td th:text="${#dates.format(item.panneDate,'dd/MM/yyyy')}"></td>
+									<td th:text="${#dates.format(item.panneReportedDate,'dd/MM/yyyy')}"></td>
+									<td th:text="${item.panneReporterName}"></td>
 									<td th:text="${#dates.format(item.contractorInformDate,'dd/MM/yyyy')}"></td>
-									<td th:switch="*{item.labHasEquipement.status}">
+									<td th:text="${#dates.format(item.maintenanceStartDate,'dd/MM/yyyy')}"></td>
+									<td>
+										<span th:if="${item.contractorRepName != null}" th:text="|${item.contractorRepName} |"></span>
+										<span th:if="${item.contractorName != null}" th:text="|(${item.contractorName})|"></span>
+									</td>
+									<td th:switch="*{item.status}">
 										<span th:case="0">HORS SERVICE</span>
 										<span th:case="1">FONCTIONNEL</span>
 										<span th:case="2">PANNE</span>
 										<span th:case="3">MAINTENANCE EN COURS</span>
 										<span th:case="4">DEPLACE</span>
 									</td>
+									<td th:text="${item.comment}"></td>
 									<td>
-										<a th:href="@{'/panne?pid='+${item.id}+'&eid='+${item?.labHasEquipement?.id}}" title="modifier" class="text-primary p-2">
-											<i class="fas fa-edit fa-lg"></i>
-										</a>
-										<a th:href="@{'/maintenance?eid='+${item?.labHasEquipement?.id}+'&pid='+${item.id}}" title="Passer à la maintenance" class="text-warning">
-											<i class="fas fa-tools fa-lg"></i>
-										</a>
-									</td>
-									<td class="">
 										<div class="d-flex justify-content-end">
-											<a th:href="@{'/panne/delete/'+${item.id}}" title="supprimer" class="text-danger">
+											<a th:href="@{'/panne?pid='+${item.panneId}+'&eid='+${item?.labEquipementId}}" title="modifier" class="text-primary p-2">
+												<i class="fas fa-edit fa-lg"></i>
+											</a>
+											<a th:href="@{'/maintenance?eid='+${item?.labEquipementId}+'&pid='+${item.panneId}}" title="Passer à la maintenance" class="text-warning p-2">
+												<i class="fas fa-tools fa-lg"></i>
+											</a>
+											<a th:href="@{'/panne/delete/'+${item.panneId}}" title="supprimer" class="text-danger p-2">
 												<i class="fa fa-trash fa-lg"></i>
 											</a>
 											&nbsp;&nbsp;
