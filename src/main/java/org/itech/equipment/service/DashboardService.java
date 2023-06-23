@@ -52,4 +52,7 @@ public interface DashboardService {
 
 	List<Map<String, Object>> getAvailability(Integer labId, Date start, Date end);
 
+	List<Map<String, Object>> getPanneByEquipement(Integer labId, Date start, Date end);
+	List<Map<String, Object>> getYearFirstMaintenanceByEquipement(Integer labId, Date start, Date end);
+
 }

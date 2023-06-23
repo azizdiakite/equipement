@@ -43,38 +43,42 @@
 			</div>
 			<hr />
 			<div class="row">
-				<div class="col-xl-4 col-md-4">
+				<div class="col-xl-3 col-md-3">
 					<div class="card mb-4">
 						<h5 class="card-header text-center">Nombre d'équipements déployés</h5>
 						<div class="card-body text-center">
+							<i class="fa fa-cog fs-2m text-primary" aria-hidden="true" ></i>
 							<span class="card-data text-primary" th:text="${equipementCount.all}"></span>
 						</div>
 					</div>
 				</div>
-				<div class="col-xl-4 col-md-4">
+				<div class="col-xl-3 col-md-3">
 					<div class="card mb-4">
 						<h5 class="card-header text-center">Nombre d'équipements fonctionnels</h5>
 						<div class="card-body text-center">
+							<i class="fa fa-thumbs-up text-success fs-2m" aria-hidden="true"></i>
 							<span class="card-data text-success" th:text="${equipementCount.fonctional}"></span>
 						</div>
 					</div>
 				</div>
-				<div class="col-xl-4 col-md-4">
+				<div class="col-xl-3 col-md-3">
 					<div class="card mb-4">
 						<h5 class="card-header text-center">Nombre d'équipements en arrêt</h5>
 						<div class="card-body text-center">
+							<i class="fa fa-thumbs-down text-danger fs-2m" aria-hidden="true"></i>
 							<span class="card-data text-danger" th:text="${equipementCount.stop}"></span>
 						</div>
 					</div>
 				</div>
-<!--  				<div class="col-xl-3 col-md-3">
+  				<div class="col-xl-3 col-md-3">
 					<div class="card mb-4">
-						<h5 class="card-header text-center">Nombre de maintenance en cours</h5>
+						<h5 class="card-header text-center">Nombre de maintenances planifiées</h5>
 						<div class="card-body text-center">
+							<i class="fa fa-clock text-info fs-2m" aria-hidden="true"></i>
 							<span class="card-data text-info" th:text="${equipementCount.current}"></span>
 						</div>
 					</div>
-				</div> -->
+				</div>
 			</div>
 			<div class="row">
 				<div class="col-xl-6">
@@ -97,6 +101,17 @@
 				</div>
 			</div>
 			<div class="row">
+				<div class="col-xl-12">
+					<div class="card mb-4">
+						<div class="card-header">
+							<i class="fas fa-chart-bar me-1"></i>
+							Nombre de type de pièces en panne
+						</div>
+						<div class="card-body" id="panne_type"></div>
+					</div>
+				</div>
+			</div>
+			<div class="row">
 				<div class="col-xl-6">
 					<div class="card mb-4">
 						<div class="card-header">
@@ -110,9 +125,9 @@
 					<div class="card mb-4">
 						<div class="card-header">
 							<i class="fas fa-chart-bar me-1"></i>
-							Pannes rapportées par criticité
+							Nombre de panne par equipement
 						</div>
-						<div class="card-body" id="panne_type"></div>
+						<div class="card-body" id="panne_by_equipement"></div>
 					</div>
 				</div>
 			</div>

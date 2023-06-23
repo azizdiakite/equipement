@@ -115,9 +115,16 @@ public class DashboardController {
 			Date endDate = ObjectUtils.isNotEmpty(end) ? df1.parse(end) : null;
 			List<Map<String, Object>> e = entityService.getPanneByType(labIb, null, startDate, endDate);
 			Map<String, String> legend = new HashMap<String, String>();
-			legend.put("1", "Mineure");
-			legend.put("2", "Critique");
-			legend.put("3", "Majeure (Arrêt)");
+			legend.put("1", "Carte mère");
+			legend.put("2", "Relai statique");
+			legend.put("3", "Compresseur");
+			legend.put("4", "Ventilateur");
+			legend.put("5", "Frayons");
+			legend.put("6", "Sonde");
+			legend.put("7", "Filtre Déshydrater");
+			legend.put("8", "Batteries");
+			legend.put("9", "Module");
+			legend.put("10", "Accessoires Divers");
 			legend.put("", "N/A");
 			e.stream().map(el -> el.replace("name", legend.get(el.get("name"))));
 			e.forEach(el -> {
@@ -195,6 +202,36 @@ public class DashboardController {
 		return new ResponseEntity<>(res, HttpStatus.OK);
 	}
 
+
+	@GetMapping(value = "/number_panne_by_equipement")
+	public ResponseEntity<Map<String, Object>> getPanneByEquipement(
+			@RequestParam(required = false, defaultValue = "0") Integer l_id,
+			@RequestParam(required = false) String start, @RequestParam(required = false) String end) {
+		Integer labIb = (l_id == 0) ? null : l_id;
+		SimpleDateFormat df1 = new SimpleDateFormat("dd/mm/yyyy");
+		Map<String, Object> res = new HashMap<String, Object>();
+		try {
+			Date startDate = ObjectUtils.isNotEmpty(start) ? df1.parse(start) : null;
+			Date endDate = ObjectUtils.isNotEmpty(end) ? df1.parse(end) : null;
+
+			List<Map<String, Object>> e = entityService.getPanneByEquipement(labIb, startDate, endDate);
+
+			List<Object> names = new ArrayList<Object>();
+			List<Object> datas = new ArrayList<Object>();
+			e.forEach(el -> {
+				names.add(el.get("name"));
+				datas.add(el.get("y"));
+			});
+
+			res.put("names", names);
+			res.put("datas", datas);
+		} catch (Exception ex) {
+			ex.printStackTrace();
+			throw new OperationFailedException(ex.getMessage());
+		}
+		return new ResponseEntity<>(res, HttpStatus.OK);
+	}
+
 	@GetMapping(value = "/equipement_by_maintenance_type")
 	public ResponseEntity<List<Map<String, Object>>> getEquipementCountByMaintenanceType(
 			@RequestParam(required = false, defaultValue = "0") Integer l_id,
@@ -252,6 +289,7 @@ public class DashboardController {
 		return new ResponseEntity<>(e, HttpStatus.OK);
 	}
 
+	/*Mean Time Between Failures = mtbf */
 	@GetMapping(value = "/mtbf")
 	public ResponseEntity<List<Map<String, Object>>> getMTBF(
 			@RequestParam(required = false, defaultValue = "0") Integer l_id,
@@ -321,6 +359,37 @@ public class DashboardController {
 			throw new OperationFailedException(ex.getMessage());
 		}
 		return new ResponseEntity<>(e, HttpStatus.OK);
+	}
+
+
+	@GetMapping(value = "/year_first_maintenance")
+	public ResponseEntity<Map<String, Object>> getYearFirstMaintenanceByEquipement(
+			@RequestParam(required = false, defaultValue = "0") Integer l_id,
+			@RequestParam(required = false) String start, @RequestParam(required = false) String end) {
+		Integer labIb = (l_id == 0) ? null : l_id;
+		SimpleDateFormat df1 = new SimpleDateFormat("dd/mm/yyyy");
+		Map<String, Object> res = new HashMap<String, Object>();
+		try {
+			Date startDate = ObjectUtils.isNotEmpty(start) ? df1.parse(start) : null;
+			Date endDate = ObjectUtils.isNotEmpty(end) ? df1.parse(end) : null;
+
+			List<Map<String, Object>> e = entityService.getYearFirstMaintenanceByEquipement(labIb, startDate, endDate);
+
+			ArrayList datas = new ArrayList<>();
+
+			e.forEach(el -> {
+				ArrayList data = new ArrayList<>();
+				data.add(String.valueOf(el.get("name")));
+				data.add(Integer.parseInt(String.valueOf(el.get("y"))));
+				data.add(false);
+				datas.add(data);
+			});
+			res.put("datas", datas);
+		} catch (Exception ex) {
+			ex.printStackTrace();
+			throw new OperationFailedException(ex.getMessage());
+		}
+		return new ResponseEntity<>(res, HttpStatus.OK);
 	}
 
 }

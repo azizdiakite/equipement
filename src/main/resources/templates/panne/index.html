@@ -41,9 +41,16 @@
 											<label for="inputType" class="form-label">Type de panne (criticité):</label>
 											<select class="form-select" name="panne_type" id="inputType" th:field="*{type}">
 												<option value="">-- Choisir une option --</option>
-												<option th:value="'1'" th:text="'1: Mineure'"></option>
-												<option th:value="'2'" th:text="'2: Critique'"></option>
-												<option th:value="'3'" th:text="'3: Majeure(Arrêt)'"></option>
+												<option th:value="'1'" th:text="'1: Carte mère'"></option>
+												<option th:value="'2'" th:text="'2: Relai statique'"></option>
+												<option th:value="'3'" th:text="'3: Compresseur'"></option>
+												<option th:value="'4'" th:text="'4: Ventilateur'"></option>
+												<option th:value="'5'" th:text="'5: Frayons'"></option>
+												<option th:value="'6'" th:text="'6: Sonde'"></option>
+												<option th:value="'7'" th:text="'7: Filtre Déshydrater'"></option>
+												<option th:value="'8'" th:text="'8: Batteries'"></option>
+												<option th:value="'9'" th:text="'9: Module'"></option>
+												<option th:value="'10'" th:text="'10: Accessoires Divers'"></option>
 											</select>
 										</div>
 									</div>

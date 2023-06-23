@@ -357,6 +357,77 @@ public class DashboardServiceImpl implements DashboardService {
 		return response;
 	}
 
+
+	public List<Map<String, Object>> getPanneByEquipement(Integer labId, Date start, Date end) {
+		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-mm-dd");
+		StringBuffer sql = new StringBuffer("");
+
+		sql.append("SELECT le.id id, e.equipement_name, COUNT(le.id) FROM lab_has_equipement le JOIN equipement e ON e.id = le.equipement_id JOIN panne p ON p.lab_has_equipement_id = le.id WHERE le.status = 2");
+
+		if (ObjectUtils.isNotEmpty(labId)) {
+			sql.append(" AND le.lab_id = ").append(labId);
+		}
+
+		if (ObjectUtils.isNotEmpty(start)) {
+			sql.append(" AND p.date >= '").append(sdf.format(start) + "'");
+		}
+
+		if (ObjectUtils.isNotEmpty(end)) {
+			sql.append(" AND p.date <= '").append(sdf.format(end) + "'");
+		}
+		sql.append(" GROUP BY e.equipement_name");
+
+		List<Map<String, Object>> response = new ArrayList<Map<String, Object>>();
+		try {
+			Query query = em.createNativeQuery(sql.toString());
+			List<Object[]> results = query.getResultList();
+			for (Object[] o : results) {
+				Map<String, Object> map = new HashMap<String, Object>();
+				map.put("name", o[1]);
+				map.put("y", o[2]);
+				response.add(map);
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return response;
+	}
+
+
+	public List<Map<String, Object>> getYearFirstMaintenanceByEquipement(Integer labId, Date start, Date end) {
+		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-mm-dd");
+		StringBuffer sql = new StringBuffer("");
+
+		sql.append("SELECT le.id id, e.equipement_name, COUNT(le.id) FROM lab_has_equipement le JOIN equipement e ON e.id = le.equipement_id JOIN maintenance m ON m.lab_has_equipement_id = le.id WHERE YEAR(m.start_date) = YEAR(CURDATE())");
+
+		if (ObjectUtils.isNotEmpty(labId)) {
+			sql.append(" AND le.lab_id = ").append(labId);
+		}
+
+		if (ObjectUtils.isNotEmpty(start)) {
+			sql.append(" AND p.date >= '").append(sdf.format(start) + "'");
+		}
+
+		if (ObjectUtils.isNotEmpty(end)) {
+			sql.append(" AND p.date <= '").append(sdf.format(end) + "'");
+		}
+		sql.append(" GROUP BY e.equipement_name");
+
+		List<Map<String, Object>> response = new ArrayList<Map<String, Object>>();
+		try {
+			Query query = em.createNativeQuery(sql.toString());
+			List<Object[]> results = query.getResultList();
+			for (Object[] o : results) {
+				Map<String, Object> map = new HashMap<String, Object>();
+				map.put("name", o[1]);
+				map.put("y", o[2]);
+				response.add(map);
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return response;
+	}
 	@Override
 	public List<Map<String, Object>> getTotalBreakdownTime(Integer labId, Date start, Date end) {
 		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-mm-dd");

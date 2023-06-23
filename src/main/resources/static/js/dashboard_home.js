@@ -186,7 +186,7 @@ $(document).ready(function() {
 					},
 					yAxis: {
 						title: {
-							text: "Nombre d'équipements",
+							text: "Nombre de pièces",
 						},
 						allowDecimals: false
 
@@ -324,4 +324,61 @@ $(document).ready(function() {
 						}]
 					});
 			});
+
+
+    //Nombre Pannes par equipements
+    $
+        .get(
+            "/dashboard/number_panne_by_equipement" +
+            window.location.search,
+            function(data) {
+                Highcharts
+                    .chart(
+                        'panne_by_equipement', {
+                        chart: {
+                            type: 'column'
+                        },
+                        title: {
+                            text: "Nombre de panne par equipement"
+                        },
+                        xAxis: {
+                        	categories: data.names,
+                        	 crosshair: true
+                        	},
+                        	yAxis: {
+                                title: {
+                                    text: "Nombre de maintenance"
+                                }
+                        	},
+                            legend: {
+                                enabled: true
+                            },
+                        legend: {
+                            enabled: true
+                        },
+                        plotOptions: {
+                            series: {
+                                allowPointSelect: true,
+                                dataLabels: {
+                                    enabled: true,
+                                }
+                            }
+                        },
+                        tooltip: {
+                            headerFormat: '<span style="font-size:10px">{point.key}</span><table>',
+                            pointFormat: '<tr><td style="color:{series.color};padding:0">{series.name}: </td>' +
+                                '<td style="padding:0"><b>{point.y:.0f} </b></td></tr>',
+                            footerFormat: '</table>',
+                            shared: true,
+                            useHTML: true
+                        },
+
+                        series: [{
+                            name: "Panne par equipement",
+                            data: data.datas,
+                            color: "#BB4EE1"
+                        }]
+                    });
+            });
+
 });
